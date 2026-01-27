@@ -61,6 +61,7 @@ struct MapView: View {
             showMap: true
         )
         .navigationBarBackButtonHidden(true)
+        .preferredColorScheme(.light)
     }
 }
 

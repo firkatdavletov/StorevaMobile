@@ -38,6 +38,6 @@ struct ProductCardButton: View {
         }
         .frame(maxWidth: .infinity)
         .background(Color.primaryContainer)
-        .clipShape(RoundedCorner(radius: 25))
+        .clipShape(RoundedCorner(radius: 16))
     }
 }

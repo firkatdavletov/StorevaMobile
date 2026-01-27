@@ -11,16 +11,16 @@ import Shared
 
 struct ProductCardView: View {
     let product: Shared.ProductModel
-    let onAddToCart: (Int64) -> Void
-    let onRemove: (Int64) -> Void
-    let onShowDetails: (Int64) -> Void
+    let onAddToCart: (Shared.ProductModel) -> Void
+    let onRemove: (Shared.ProductModel) -> Void
+    let onShowDetails: (Shared.ProductModel) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             RemoteImage(urlString: product.imageUrl)
                 .frame(height: 112)
                 .clipShape(
-                    RoundedRectangle(cornerRadius: 25, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                 )
 
             Text("\(Int(product.price)) руб")
@@ -35,8 +35,8 @@ struct ProductCardView: View {
 
             CartButton(
                 quantity: Int(product.count),
-                onAdd: { onAddToCart(product.id) },
-                onRemove: { onRemove(product.id) },
+                onAdd: { onAddToCart(product) },
+                onRemove: { onRemove(product) },
                 foregroundColor: Color.onPrimaryContainer
             )
                 .padding(.horizontal, 8)
@@ -44,11 +44,15 @@ struct ProductCardView: View {
                 .allowsHitTesting(true)
         }
         .background(Color.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 25))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.primaryContainer, lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .frame(height: 234)
-        .contentShape(RoundedRectangle(cornerRadius: 25))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
         .onTapGesture {
-            onShowDetails(product.id)
+            onShowDetails(product)
         }
     }
 }

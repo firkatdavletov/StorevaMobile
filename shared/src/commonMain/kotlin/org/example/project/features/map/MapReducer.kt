@@ -5,7 +5,7 @@ import org.example.project.domain.models.DepartmentModel
 import org.example.project.features.base.Reducer
 import org.example.project.features.utils.DistanceCalculator
 
-class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
+class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
     override fun reduce(
         state: MapViewState,
         event: MapViewEvent,
@@ -19,6 +19,7 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                             UiPoint(it.latitude, it.longitude)
                         }
                     }
+
                     DeliveryType.DELIVERY -> {
                         cart.deliveryAddress?.let {
                             UiPoint(it.latitude, it.longitude)
@@ -48,33 +49,39 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     isError = false,
                     showLocation = false,
                     currentPosition = UiPoint(event.latitude, event.longitude),
-                    confirmEnabled = state.deliveryType == DeliveryType.PICKUP && state.selectedDepartment != null
+                    confirmEnabled = state.deliveryType == DeliveryType.PICKUP && state.selectedDepartment != null,
                 )
             }
 
-            is MapViewEvent.OnShowDepartments -> state.copy(
-                isLoading = false,
-                departments = event.departments
-            )
+            is MapViewEvent.OnShowDepartments -> {
+                state.copy(
+                    isLoading = false,
+                    departments = event.departments,
+                )
+            }
 
-            is MapViewEvent.OnMoveToLocation -> state.copy(
-                isSearching = true,
-                isError = false,
-                currentPosition = UiPoint(event.latitude, event.longitude),
-                showLocation = true,
-            )
+            is MapViewEvent.OnMoveToLocation -> {
+                state.copy(
+                    isSearching = true,
+                    isError = false,
+                    currentPosition = UiPoint(event.latitude, event.longitude),
+                    showLocation = true,
+                )
+            }
 
             is MapViewEvent.OnChangeDeliveryType -> {
                 val department = findClosestDepartment(
                     lat = state.currentPosition!!.latitude,
                     lon = state.currentPosition.longitude,
-                    departments = state.departments
+                    departments = state.departments,
                 )
                 val currentPosition = if (event.type == DeliveryType.PICKUP) {
                     department?.let {
                         UiPoint(it.latitude, it.longitude)
                     } ?: state.currentPosition
-                } else state.currentPosition
+                } else {
+                    state.currentPosition
+                }
                 val workTimeStr = department?.let {
                     buildString {
                         val workingHours = department.currentWorkingHours
@@ -98,9 +105,11 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                 )
             }
 
-            is MapViewEvent.OnConfirm -> state.copy(
-                isLoading = true
-            )
+            is MapViewEvent.OnConfirm -> {
+                state.copy(
+                    isLoading = true,
+                )
+            }
 
             is MapViewEvent.OnDepartmentSelected -> {
                 val department = state.departments.firstOrNull { it.id == event.id }
@@ -129,7 +138,9 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                         currentPosition = UiPoint(department.latitude, department.longitude),
                         confirmEnabled = true,
                     )
-                } else state
+                } else {
+                    state
+                }
             }
 
             is MapViewEvent.OnFoundAddress -> {
@@ -172,7 +183,7 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     deliveryAddress = addressString,
                     deliveryInfo = deliveryInfo,
                     confirmEnabled = true,
-                    city = event.address.city
+                    city = event.address.city,
                 )
             }
 
@@ -184,13 +195,13 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
 
             is MapViewEvent.OnError -> {
                 state.copy(
-                    isLoading = false
+                    isLoading = false,
                 )
             }
 
             MapViewEvent.OnDefaultError -> {
                 state.copy(
-                    isLoading = false
+                    isLoading = false,
                 )
             }
 
@@ -199,10 +210,13 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     isSearching = false,
                     isError = true,
                     deliveryInfo = event.message,
-                    confirmEnabled = false
+                    confirmEnabled = false,
                 )
             }
-            else -> state
+
+            else -> {
+                state
+            }
         }
     }
 
@@ -217,7 +231,7 @@ class MapReducer: Reducer<MapViewState, MapViewEvent, MapViewEffect> {
     private fun findClosestDepartment(
         lat: Double,
         lon: Double,
-        departments: List<DepartmentModel>
+        departments: List<DepartmentModel>,
     ): DepartmentModel? {
         return departments.minByOrNull { department ->
             DistanceCalculator.haversineDistance(lat, lon, department.latitude, department.longitude)

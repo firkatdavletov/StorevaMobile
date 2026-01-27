@@ -32,7 +32,7 @@ struct ConfirmButton: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(isDisabled ? Color.gray : Color("PrimaryColor"))
-            .cornerRadius(25)
+            .cornerRadius(16)
         }
         .disabled(isDisabled || isLoading)
     }

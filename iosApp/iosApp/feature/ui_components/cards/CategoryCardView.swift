@@ -7,28 +7,34 @@
 //
 
 import SwiftUI
+import Shared
 
 struct CategoryCardView: View {
     let title: String
-    let imageUrl: String?
+    let products: [Shared.ProductModel]
+    // Две колонки для LazyVGrid
+    let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            RemoteImage(urlString: imageUrl)
-                .frame(height: 112)
-                .clipShape(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                )
-
             Text(title)
-                .font(AppTypography.titleMedium.weight(.semibold))
-                .foregroundColor(Color.onBackground)
-            Spacer()
+                .font(.headline)
+                .padding(.horizontal)
+            
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(products, id: \.id) { product in
+                    ProductCardView(
+                        product: product,
+                        onAddToCart: {id in },
+                        onRemove: {id in },
+                        onShowDetails: {id in}
+                    )
+                }
+            }
+            .padding(.horizontal)
         }
     }
-}
-
-#Preview {
-    CategoryCardView(title: "String", imageUrl: "")
-        .frame(width: 200, height: 200)
 }

@@ -98,8 +98,7 @@ extension HomeContent2 {
             ]
         ) {
             ForEach(categories, id: \.id) { category in
-                CategoryCardView(title: category.title, imageUrl: category.imageUrl)
-                    .frame(height: 150)
+                
             }
         }
     }

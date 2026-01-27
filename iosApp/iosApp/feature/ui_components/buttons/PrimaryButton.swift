@@ -23,10 +23,10 @@ struct PrimaryButton: View {
                 Text(title)
                     .font(AppTypography.titleMedium)
                     .frame(maxWidth: .infinity)
-                    .padding(12)
+                    .padding(14)
                     .background(enabled ? Color.primaryContainer : Color.primaryContainer.opacity(0.5))
                     .foregroundColor(Color.onPrimaryContainer)
-                    .cornerRadius(25)
+                    .cornerRadius(16)
             }
         )
         .disabled(!enabled)

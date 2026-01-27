@@ -14,11 +14,11 @@ abstract class MapComponent(
     snackBarManager: SnackBarManager,
     initialState: MapViewState,
 ) : BaseComponent<MapViewState, MapViewEvent, MapViewEffect>(
-    componentContext = componentContext,
-    initialState = initialState,
-    reducer = MapReducer(),
-    snackBarManager = snackBarManager,
-) {
+        componentContext = componentContext,
+        initialState = initialState,
+        reducer = MapReducer(),
+        snackBarManager = snackBarManager,
+    ) {
 
     abstract override fun onEvent(event: MapViewEvent)
 }

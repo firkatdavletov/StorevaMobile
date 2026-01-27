@@ -6,36 +6,40 @@ import kotlinx.serialization.Serializable
 sealed class Config {
     @Serializable
     data object AppIntroduction : Config()
-    @Serializable
-    data class SelectAddress(val fromScreen: String?): Config()
-    @Serializable
-    data object Home: Config()
-    @Serializable
-    data object Launch: Config()
 
     @Serializable
-    data object Cart: Config()
+    data class SelectAddress(val fromScreen: String?) : Config()
+
     @Serializable
-    data object Payment: Config()
+    data object Home : Config()
+
+    @Serializable
+    data object Launch : Config()
+
+    @Serializable
+    data object Cart : Config()
+
+    @Serializable
+    data object Payment : Config()
 
     @Serializable
     data class CurrentOrder(
         val fromScreen: String?,
-        val orderId: Long
-    ): Config()
+        val orderId: Long,
+    ) : Config()
 
     @Serializable
     data class Catalog(
         val categoryId: Long,
         val title: String,
-    ): Config()
+    ) : Config()
 
     @Serializable
     data object Profile : Config()
 
     @Serializable
     data class SignIn(
-        val fromScreen: String?
+        val fromScreen: String?,
     ) : Config()
 
     @Serializable

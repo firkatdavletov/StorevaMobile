@@ -18,7 +18,6 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.value.Value
-import org.example.project.features.dialogs.product_card.ProductCardComponent
 import org.example.project.features.SnackBarManager
 import org.example.project.features.app_introduction.AppIntroCallbacks
 import org.example.project.features.app_introduction.AppIntroductionComponent
@@ -36,6 +35,7 @@ import org.example.project.features.dialogs.delete_user_dialog.DeleteUserCompone
 import org.example.project.features.dialogs.delete_user_dialog.DeleteUserDialogCallbacks
 import org.example.project.features.dialogs.logout_user_dialog.LogoutUserComponent
 import org.example.project.features.dialogs.logout_user_dialog.LogoutUserDialogCallbacks
+import org.example.project.features.dialogs.product_card.ProductCardComponent
 import org.example.project.features.home.HomeCallbacks
 import org.example.project.features.home.HomeComponent
 import org.example.project.features.launch.LaunchComponent
@@ -70,21 +70,21 @@ class DefaultRootComponent(
     override val snackBarManager: SnackBarManager,
 ) : RootComponent, ComponentContext by componentContext, KoinComponent {
 
-    private val navigation  = StackNavigation<Config>()
+    private val navigation = StackNavigation<Config>()
     private val dialogNavigation = SlotNavigation<DialogConfig>()
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = childStack(
         source = navigation,
         serializer = Config.serializer(),
         initialConfiguration = Config.Launch,
-        childFactory = ::createChild
+        childFactory = ::createChild,
     )
 
     override val dialogStack: Value<ChildSlot<*, RootComponent.BottomChild>> = childSlot(
         source = dialogNavigation,
         serializer = DialogConfig.serializer(),
         handleBackButton = true,
-        childFactory = ::createBottomChild
+        childFactory = ::createBottomChild,
     )
 
     override fun onBackClicked(toIndex: Int) {
@@ -97,24 +97,29 @@ class DefaultRootComponent(
 
     private fun createChild(
         config: Config,
-        componentContext: ComponentContext
+        componentContext: ComponentContext,
     ): RootComponent.Child {
         return when (config) {
             is Config.AppIntroduction -> {
                 AppIntroduction(getAppIntroComponent(componentContext))
             }
+
             is Config.Launch -> {
                 Launch(getLaunchComponent(componentContext))
             }
+
             is Config.SelectAddress -> {
                 SelectAddress(getMapComponent(componentContext, config))
             }
+
             is Config.Home -> {
                 Home(getHomeComponent(componentContext, config))
             }
+
             is Config.Cart -> {
                 Cart(getCartComponent(componentContext, config))
             }
+
             is Config.Payment -> {
                 Payment(getPaymentComponent(componentContext))
             }
@@ -134,6 +139,7 @@ class DefaultRootComponent(
             is Config.SignIn -> {
                 SignIn(getSignInComponent(componentContext, config))
             }
+
             is Config.Verification -> {
                 Verification(getVerificationComponent(componentContext, config))
             }
@@ -146,15 +152,17 @@ class DefaultRootComponent(
 
     private fun createBottomChild(
         dialogConfig: DialogConfig,
-        componentContext: ComponentContext
+        componentContext: ComponentContext,
     ): RootComponent.BottomChild {
         return when (dialogConfig) {
             is DialogConfig.ProductCard -> {
                 ProductCard(getProductCardComponent(componentContext, dialogConfig))
             }
+
             is DialogConfig.DeleteUser -> {
                 DeleteUser(getDeleteUserComponent(componentContext, dialogConfig))
             }
+
             is DialogConfig.LogoutUser -> {
                 LogoutUser(getLogoutUserComponent(componentContext, dialogConfig))
             }
@@ -164,7 +172,7 @@ class DefaultRootComponent(
     private fun getLaunchComponent(componentContext: ComponentContext): LaunchComponent {
         val callbacks = LaunchNavigationCallbacks(
             navigateToSelectAddress = { navigation.pushNew(Config.SelectAddress(LaunchComponent::class.simpleName)) },
-            navigateToHome = { navigation.pushToFront(Config.Home) }
+            navigateToHome = { navigation.pushToFront(Config.Home) },
         )
 
         return get { parametersOf(componentContext, callbacks) }
@@ -174,13 +182,17 @@ class DefaultRootComponent(
         val callbacks = AppIntroCallbacks(
             navigateToAuth = {
                 navigation.pushToFront(
-                    Config.SignIn(AppIntroductionComponent::class.simpleName)
-                ) }
+                    Config.SignIn(AppIntroductionComponent::class.simpleName),
+                )
+            },
         )
         return get { parametersOf(componentContext, callbacks) }
     }
 
-    private fun getMapComponent(componentContent: ComponentContext, config: Config.SelectAddress): MapComponent {
+    private fun getMapComponent(
+        componentContent: ComponentContext,
+        config: Config.SelectAddress,
+    ): MapComponent {
         val callbacks = MapCallbacks(
             navigateBack = {
                 navigation.pop()
@@ -193,15 +205,21 @@ class DefaultRootComponent(
             },
             navigateToPayment = {
                 navigation.pushToFront(Config.Payment)
-            }
+            },
         )
         return get { parametersOf(componentContent, config.fromScreen, callbacks) }
     }
 
-    private fun getHomeComponent(componentContent: ComponentContext, config: Config.Home): HomeComponent {
+    private fun getHomeComponent(
+        componentContent: ComponentContext,
+        config: Config.Home,
+    ): HomeComponent {
         val callbacks = HomeCallbacks(
             navigateToMap = {
-                if (!childStack.items.any { it.configuration == Config.SelectAddress(HomeComponent::class.simpleName) }) {
+                if (!childStack.items.any {
+                        it.configuration == Config.SelectAddress(HomeComponent::class.simpleName)
+                    }
+                ) {
                     navigation.pushNew(Config.SelectAddress(HomeComponent::class.simpleName))
                 } else {
                     navigation.pushToFront(Config.SelectAddress(HomeComponent::class.simpleName))
@@ -210,18 +228,17 @@ class DefaultRootComponent(
             navigateToCart = {
                 navigation.pushToFront(Config.Cart)
             },
-            navigateToCategory = { categoryId, title, ->
-                if (!childStack.items.any { it.configuration == Config.Catalog(categoryId, title) }) {
-                    navigation.pushNew(Config.Catalog(categoryId, title))
-                } else {
-                    navigation.pushToFront(Config.Catalog(categoryId, title))
-                }
+            showProductCard = {
+                dialogNavigation.activate(DialogConfig.ProductCard(it.id.toInt()))
             },
             navigateToProfile = {
                 navigation.pushToFront(Config.Profile)
             },
             navigateToOrder = { orderId ->
-                if (!childStack.items.any { it.configuration == Config.CurrentOrder(HomeComponent::class.simpleName, orderId) }) {
+                if (!childStack.items.any {
+                        it.configuration == Config.CurrentOrder(HomeComponent::class.simpleName, orderId)
+                    }
+                ) {
                     navigation.pushNew(Config.CurrentOrder(HomeComponent::class.simpleName, orderId))
                 } else {
                     navigation.pushToFront(Config.CurrentOrder(HomeComponent::class.simpleName, orderId))
@@ -229,12 +246,15 @@ class DefaultRootComponent(
             },
             navigateToAuthorization = {
                 navigation.pushToFront(Config.SignIn(HomeComponent::class.simpleName))
-            }
+            },
         )
         return get { parametersOf(componentContent, callbacks) }
     }
 
-    private fun getCartComponent(componentContext: ComponentContext, config: Config.Cart): CartComponent {
+    private fun getCartComponent(
+        componentContext: ComponentContext,
+        config: Config.Cart,
+    ): CartComponent {
         val callbacks = CartViewCallbacks(
             navigateToPayment = {
                 navigation.pushToFront(Config.Payment)
@@ -244,7 +264,7 @@ class DefaultRootComponent(
             },
             navigateToLogin = {
                 navigation.pushToFront(Config.SignIn(CartComponent::class.simpleName))
-            }
+            },
         )
         return get { parametersOf(componentContext, config, callbacks) }
     }
@@ -253,29 +273,37 @@ class DefaultRootComponent(
     private fun getPaymentComponent(componentContext: ComponentContext): PaymentComponent {
         val callbacks = PaymentCallbacks(
             navigateBack = {
-                navigation.popWhile( { config ->
+                navigation.popWhile({ config ->
                     config != Config.Cart
-                } )
+                })
             },
             navigateToOrder = { navigation.push(Config.CurrentOrder(PaymentComponent::class.simpleName, it)) },
-            navigateToMap = { navigation.pushNew(Config.SelectAddress(PaymentComponent::class.simpleName)) }
+            navigateToMap = { navigation.pushNew(Config.SelectAddress(PaymentComponent::class.simpleName)) },
         )
         return get { parametersOf(componentContext, callbacks) }
     }
 
-    private fun getCurrentOrderComponent(context: ComponentContext, fromScreen: String?, orderId: Long): CurrentOrderComponent {
+    private fun getCurrentOrderComponent(
+        context: ComponentContext,
+        fromScreen: String?,
+        orderId: Long,
+    ): CurrentOrderComponent {
         val callbacks = CurrentOrderCallbacks(
             navigateToBack = { navigation.pop() },
             navigateToHome = {
                 navigation.pushToFront(Config.Home)
-            }
+            },
         )
         return get {
             parametersOf(context, fromScreen, callbacks, orderId)
         }
     }
 
-    private fun getCatalogComponent(context: ComponentContext, categoryId: Long, title: String): CatalogComponent {
+    private fun getCatalogComponent(
+        context: ComponentContext,
+        categoryId: Long,
+        title: String,
+    ): CatalogComponent {
         val callbacks = CatalogCallbacks(
             onBack = {
                 navigation.pop()
@@ -285,7 +313,7 @@ class DefaultRootComponent(
             },
             showProductCard = {
                 dialogNavigation.activate(DialogConfig.ProductCard(it))
-            }
+            },
         )
         return get {
             parametersOf(context, categoryId, title, callbacks)
@@ -294,13 +322,13 @@ class DefaultRootComponent(
 
     private fun getProfileComponent(context: ComponentContext): ProfileComponent {
         val callbacks = ProfileCallbacks(
-            navigateBack = {  navigation.pop() },
+            navigateBack = { navigation.pop() },
             showDeleteUserDialog = {
                 dialogNavigation.activate(DialogConfig.DeleteUser)
             },
             showLogoutUserDialog = {
                 dialogNavigation.activate(DialogConfig.LogoutUser)
-            }
+            },
         )
 
         return get {
@@ -308,7 +336,10 @@ class DefaultRootComponent(
         }
     }
 
-    private fun getSignInComponent(componentContext: ComponentContext, config: Config.SignIn): SignInComponent {
+    private fun getSignInComponent(
+        componentContext: ComponentContext,
+        config: Config.SignIn,
+    ): SignInComponent {
         val callbacks = SignInCallbacks(
             navigateToHome = {
                 navigation.pushToFront(Config.Home)
@@ -318,28 +349,7 @@ class DefaultRootComponent(
             },
             onBack = {
                 navigation.pop()
-            }
-        )
-        return get {
-            parametersOf(
-                componentContext,
-                config,
-                callbacks
-            )
-        }
-    }
-
-    private fun getVerificationComponent(componentContext: ComponentContext, config: Config.Verification): VerificationComponent {
-        val callbacks = VerifyCallbacks(
-            onBack = {
-                navigation.pop()
             },
-            navigateToHome = {
-                navigation.pushToFront(Config.Home)
-            },
-            navigateToPayment = {
-                navigation.pushToFront(Config.Payment)
-            }
         )
         return get {
             parametersOf(
@@ -350,7 +360,34 @@ class DefaultRootComponent(
         }
     }
 
-    private fun getSearchAddressComponent(componentContext: ComponentContext, config: Config.SearchAddress): SearchAddressComponent {
+    private fun getVerificationComponent(
+        componentContext: ComponentContext,
+        config: Config.Verification,
+    ): VerificationComponent {
+        val callbacks = VerifyCallbacks(
+            onBack = {
+                navigation.pop()
+            },
+            navigateToHome = {
+                navigation.pushToFront(Config.Home)
+            },
+            navigateToPayment = {
+                navigation.pushToFront(Config.Payment)
+            },
+        )
+        return get {
+            parametersOf(
+                componentContext,
+                config,
+                callbacks,
+            )
+        }
+    }
+
+    private fun getSearchAddressComponent(
+        componentContext: ComponentContext,
+        config: Config.SearchAddress,
+    ): SearchAddressComponent {
         val callbacks = SearchAddressCallbacks(
             navigateToHome = {
                 navigation.pushToFront(Config.Home)
@@ -363,25 +400,30 @@ class DefaultRootComponent(
             },
             navigateToPayment = {
                 navigation.pushToFront(Config.Payment)
-            }
+            },
         )
         return get {
             parametersOf(
                 componentContext,
                 callbacks,
-                config.fromScreen
+                config.fromScreen,
             )
         }
     }
 
-    private fun getProductCardComponent(componentContent: ComponentContext, dialogConfig: DialogConfig.ProductCard): ProductCardComponent {
-
+    private fun getProductCardComponent(
+        componentContent: ComponentContext,
+        dialogConfig: DialogConfig.ProductCard,
+    ): ProductCardComponent {
         return get {
             parametersOf(componentContent, dialogConfig)
         }
     }
 
-    private fun getLogoutUserComponent(componentContent: ComponentContext, dialogConfig: DialogConfig.LogoutUser): LogoutUserComponent {
+    private fun getLogoutUserComponent(
+        componentContent: ComponentContext,
+        dialogConfig: DialogConfig.LogoutUser,
+    ): LogoutUserComponent {
         val callbacks = LogoutUserDialogCallbacks(
             onDismiss = {
                 dialogNavigation.dismiss()
@@ -389,14 +431,17 @@ class DefaultRootComponent(
             onSuccess = {
                 dialogNavigation.dismiss()
                 navigation.pop()
-            }
+            },
         )
         return get {
             parametersOf(componentContent, dialogConfig, callbacks)
         }
     }
 
-    private fun getDeleteUserComponent(componentContent: ComponentContext, dialogConfig: DialogConfig.DeleteUser): DeleteUserComponent {
+    private fun getDeleteUserComponent(
+        componentContent: ComponentContext,
+        dialogConfig: DialogConfig.DeleteUser,
+    ): DeleteUserComponent {
         val callbacks = DeleteUserDialogCallbacks(
             onDismiss = {
                 dialogNavigation.dismiss()
@@ -404,7 +449,7 @@ class DefaultRootComponent(
             onSuccess = {
                 dialogNavigation.dismiss()
                 navigation.pop()
-            }
+            },
         )
         return get {
             parametersOf(componentContent, dialogConfig, callbacks)

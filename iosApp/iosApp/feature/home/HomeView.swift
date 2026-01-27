@@ -44,8 +44,18 @@ struct HomeView: View {
             },
             onOrderClicked: { id in
                 component.onEvent(event: HomeViewEventOnOrderClicked(id: id))
+            },
+            onAddToCart: { product in
+                component.onEvent(event: HomeViewEventOnAddToCart(product: product))
+            },
+            onRemoveFromCart: { product in
+                component.onEvent(event: HomeViewEventOnRemoveFromCart(product: product))
+            },
+            onShowDetails: { product in
+                component.onEvent(event: HomeViewEventOnShowDetails(product: product))
             }
         )
         .navigationBarBackButtonHidden(true)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
