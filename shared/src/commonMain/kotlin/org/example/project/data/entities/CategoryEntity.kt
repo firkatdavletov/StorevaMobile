@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 data class CategoryEntity(
     val id: Long,
     val parentCategory: Long?,
+    val children: List<CategoryEntity>,
     val title: String,
     val imageUrl: String?,
     val products: List<ProductEntity>,
-    val span: Int,
 )

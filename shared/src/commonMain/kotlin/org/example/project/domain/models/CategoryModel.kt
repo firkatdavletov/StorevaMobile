@@ -7,5 +7,4 @@ data class CategoryModel(
     val parentCategoryId: Long?,
     val products: List<ProductModel>,
     val selected: Boolean,
-    val span: Int,
 )

@@ -25,10 +25,14 @@ struct HomeContent: View {
     let onCartButtonClicked: () -> Void
     let onPersonClicked: () -> Void
     let onOrderClicked: (Int64) -> Void
+    let onAddToCart: (Shared.ProductModel) -> Void
+    let onRemoveFromCart: (Shared.ProductModel) -> Void
+    let onShowDetails: (Shared.ProductModel) -> Void
 
     @State private var focused: Bool = false
     
     var columns = [
+      GridItem(.flexible()),
       GridItem(.flexible()),
       GridItem(.flexible()),
     ]
@@ -46,7 +50,10 @@ struct HomeContent: View {
                     }
                     Section(header: ordersPagerItem) {}
                     ForEach(categories, id: \.id) { category in
-                        CategoryCardView(title: category.title, imageUrl: category.imageUrl)
+                        CategoryCardView(
+                            title: category.title,
+                            imageUrl: category.imageUrl
+                        )
                             .onTapGesture {
                                 onCategoryClicked(category)
                             }
@@ -210,96 +217,3 @@ struct HomeCategoryView: View {
         .cornerRadius(12)
     }
 }
-
-#Preview {
-    HomeContent(
-        userName: "Firkat",
-        addressString: "улица Косоротова, 6",
-        deliveryInfo: "Доставка 100 ₽",
-        currentOrders: [
-            OrderUIModel(
-                id: 1,
-                number: "1243",
-                status: "Собираем",
-                amount: 100
-            ),
-            OrderUIModel(
-                id: 2,
-                number: "467",
-                status: "В пути",
-                amount: 100
-            )
-        ],
-        categories: [
-            CategoryModel(
-                id: 0,
-                title: "Выбор пользователей",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            ),
-            CategoryModel(
-                id: 1,
-                title: "Избранное",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            ),
-            CategoryModel(
-                id: 2,
-                title: "Пицца",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            ),
-            CategoryModel(
-                id: 3,
-                title: "Выбор пользователей",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            ),
-            CategoryModel(
-                id: 4,
-                title: "Избранное",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            ),
-            CategoryModel(
-                id: 5,
-                title: "Пицца",
-                imageUrl: nil,
-                parentCategoryId: 0,
-                products: [],
-                selected: true,
-                span: 2
-            )
-        ],
-        totalAmount: 100,
-        productsPrice: 0,
-        freeDeliveryPrice: 0.0,
-        storeIsClosed: false) {
-            
-        } onCategoryClicked: { CategoryModel in
-            
-        } onCartButtonClicked: {
-            
-        } onPersonClicked: {
-            
-        } onOrderClicked: { Int64 in
-            
-        }
-
-}
-
