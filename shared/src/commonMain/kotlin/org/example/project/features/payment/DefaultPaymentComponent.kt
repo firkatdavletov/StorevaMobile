@@ -27,31 +27,30 @@ class DefaultPaymentComponent(
     private val getPaymentTypesUseCase: GetPaymentTypesUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val updateCartAddressUseCase: UpdateDeliveryAddressUseCase,
-    private val clearCartUseCase: ClearCartUseCase
+    private val clearCartUseCase: ClearCartUseCase,
 ) : PaymentComponent(
-    componentContext = componentContext,
-    initialState = PaymentViewState(
-        isLoading = true,
-        deliveryType = DeliveryType.DELIVERY,
-        addressString = null,
-        departmentName = null,
-        isPrivateHome = false,
-        entrance = "",
-        flat = "",
-        comment = "",
-        productPrice = 0,
-        deliveryPrice = 0,
-        totalAmount = 0,
-        paymentTypes = emptyList(),
-        storeIsClosed = false
-    ),
-    snackBarManager = snackBarManager
-) {
+        componentContext = componentContext,
+        initialState = PaymentViewState(
+            isLoading = true,
+            deliveryType = DeliveryType.DELIVERY,
+            addressString = null,
+            departmentName = null,
+            isPrivateHome = false,
+            entrance = "",
+            flat = "",
+            comment = "",
+            productPrice = 0,
+            deliveryPrice = 0,
+            totalAmount = 0,
+            paymentTypes = emptyList(),
+            storeIsClosed = false,
+        ),
+        snackBarManager = snackBarManager,
+    ) {
     private var cartItems: List<CartItemModel> = emptyList()
     private var deliveryAddress: AddressModel? = null
-    private var departmentId: Int? = null
+    private var departmentId: Long? = null
     private var deliveryInfoModel: DeliveryInfoModel? = null
-
 
     override fun onStart() {
         super.onStart()
@@ -60,25 +59,60 @@ class DefaultPaymentComponent(
 
     override fun onEvent(event: PaymentViewEvent) {
         when (event) {
-            is PaymentViewEvent.OnCartChanged -> reduce(event)
-            is PaymentViewEvent.OnPaymentTypesLoaded -> reduce(event)
+            is PaymentViewEvent.OnCartChanged -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnPaymentTypesLoaded -> {
+                reduce(event)
+            }
+
             is PaymentViewEvent.OnChangeDeliveryType -> {
                 reduce(event)
                 updateDeliveryAddress(event.deliveryType)
             }
-            PaymentViewEvent.OnBackButtonClicked -> callbacks.navigateBack()
-            PaymentViewEvent.OnConfirmButtonClicked -> createOrder()
-            PaymentViewEvent.OnChangeAddress -> callbacks.navigateToMap()
-            is PaymentViewEvent.OnIsPrivateHouseChanged -> reduce(event)
-            is PaymentViewEvent.OnEntranceInputError -> reduce(event)
-            is PaymentViewEvent.OnFlatInputError -> reduce(event)
-            is PaymentViewEvent.OnEntranceChanged -> reduce(event)
-            is PaymentViewEvent.OnFlatChanged -> reduce(event)
-            is PaymentViewEvent.OnCommentChanged -> reduce(event)
+
+            PaymentViewEvent.OnBackButtonClicked -> {
+                callbacks.navigateBack()
+            }
+
+            PaymentViewEvent.OnConfirmButtonClicked -> {
+                createOrder()
+            }
+
+            PaymentViewEvent.OnChangeAddress -> {
+                callbacks.navigateToMap()
+            }
+
+            is PaymentViewEvent.OnIsPrivateHouseChanged -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnEntranceInputError -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnFlatInputError -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnEntranceChanged -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnFlatChanged -> {
+                reduce(event)
+            }
+
+            is PaymentViewEvent.OnCommentChanged -> {
+                reduce(event)
+            }
+
             is PaymentViewEvent.OnError -> {
                 reduce(event)
                 showError(event.message)
             }
+
             is PaymentViewEvent.OnThrowError -> {
                 reduce(event)
                 showThrowError(event.throwable)
@@ -102,18 +136,21 @@ class DefaultPaymentComponent(
     }
 
     private suspend fun loadPaymentTypes() {
-        getPaymentTypesUseCase.invoke(Unit)
+        getPaymentTypesUseCase
+            .invoke(Unit)
             .catch {
                 onEvent(PaymentViewEvent.OnThrowError(it))
-            }
-            .collect {
+            }.collect {
                 onEvent(PaymentViewEvent.OnPaymentTypesLoaded(it))
             }
     }
 
     private fun validateInput(): Boolean {
         return when (state.value.deliveryType) {
-            DeliveryType.PICKUP -> true
+            DeliveryType.PICKUP -> {
+                true
+            }
+
             DeliveryType.DELIVERY -> {
                 if (state.value.addressString == null) {
                     return false
@@ -157,49 +194,54 @@ class DefaultPaymentComponent(
         coroutineScope.launch {
             val params = CreateOrderUseCase.Params(
                 deliveryType = state.value.deliveryType,
-                amount = state.value.totalAmount.toFloat(),
-                deliveryPrice = state.value.deliveryPrice.toFloat(),
+                amount = state.value.totalAmount,
+                deliveryPrice = state.value.deliveryPrice,
                 products = cartItems.map { cartItemModel ->
                     OrderItemModel(
                         productId = cartItemModel.productId,
                         name = cartItemModel.title,
                         quantity = cartItemModel.quantity,
-                        price = cartItemModel.price
+                        price = cartItemModel.price,
+                        imageUrl = null,
+                        totalPrice = cartItemModel.price * cartItemModel.quantity,
+                        unit = cartItemModel.unit,
                     )
                 },
                 deliveryAddress = deliveryAddress?.copy(
                     entrance = state.value.entrance.toIntOrNull(),
-                    flat = state.value.flat
+                    flat = state.value.flat,
                 ),
                 comment = state.value.comment,
-                departmentId = departmentId
+                departmentId = departmentId,
             )
-            createOrderUseCase.invoke(params)
+            createOrderUseCase
+                .invoke(params)
                 .catch {
                     onEvent(PaymentViewEvent.OnThrowError(it))
-                }
-                .collect { result ->
+                }.collect { result ->
                     when (result) {
                         is ResultModel.Error -> {
                             onEvent(PaymentViewEvent.OnError(result.message))
                         }
+
                         ResultModel.Loading -> {
-
                         }
-                        is ResultModel.Success<OrderModel> -> {
 
+                        is ResultModel.Success<OrderModel> -> {
                             val order = result.data
 
-                            clearCartUseCase.invoke(Unit)
+                            clearCartUseCase
+                                .invoke(Unit)
                                 .catch {
                                     onEvent(PaymentViewEvent.OnThrowError(it))
-                                }
-                                .collect { result ->
+                                }.collect { result ->
                                     when (result) {
                                         is ResultModel.Error -> {
                                             onEvent(PaymentViewEvent.OnError(result.message))
                                         }
+
                                         ResultModel.Loading -> {}
+
                                         is ResultModel.Success<Boolean> -> {
                                             updateDeliveryAddress(state.value.deliveryType)
                                             withContext(Dispatchers.Main) {
@@ -208,7 +250,6 @@ class DefaultPaymentComponent(
                                         }
                                     }
                                 }
-
                         }
                     }
                 }
@@ -224,9 +265,10 @@ class DefaultPaymentComponent(
                     deliveryAddress = null,
                     departmentId = departmentId,
                     comment = state.value.comment,
-                    deliveryInfo = deliveryInfoModel!!
+                    deliveryInfo = deliveryInfoModel!!,
                 )
             }
+
             DeliveryType.DELIVERY -> {
                 val deliveryAddress = deliveryAddress ?: return
                 val departmentId = departmentId ?: return
@@ -234,26 +276,28 @@ class DefaultPaymentComponent(
                     deliveryType = deliveryType,
                     deliveryAddress = deliveryAddress.copy(
                         entrance = state.value.entrance.toIntOrNull(),
-                        flat = state.value.flat
+                        flat = state.value.flat,
                     ),
                     departmentId = departmentId,
                     comment = state.value.comment,
-                    deliveryInfo = deliveryInfoModel!!
+                    deliveryInfo = deliveryInfoModel!!,
                 )
             }
         }
 
         coroutineScope.launch {
-            updateCartAddressUseCase.invoke(params)
+            updateCartAddressUseCase
+                .invoke(params)
                 .catch {
                     onEvent(PaymentViewEvent.OnThrowError(it))
-                }
-                .collect { resultModel ->
+                }.collect { resultModel ->
                     when (resultModel) {
                         is ResultModel.Error -> {
                             onEvent(PaymentViewEvent.OnError(resultModel.message))
                         }
+
                         ResultModel.Loading -> {}
+
                         is ResultModel.Success<Boolean> -> {
                             if (!resultModel.data) {
                                 onEvent(PaymentViewEvent.OnError(null))

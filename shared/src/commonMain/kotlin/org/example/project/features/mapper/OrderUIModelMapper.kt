@@ -10,7 +10,7 @@ class OrderUIModelMapper {
             id = model.id,
             number = model.id.toString(),
             status = OrderStatus.getTitle(model.status),
-            amount = model.totalAmount.toInt()
+            amount = model.totalAmount,
         )
     }
 }

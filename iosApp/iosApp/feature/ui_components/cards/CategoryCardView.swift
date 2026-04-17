@@ -15,7 +15,6 @@ struct CategoryCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             RemoteImage(urlString: imageUrl)
-                .frame(maxWidth: .infinity)
                 .frame(height: 96)
                 .clipShape(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -25,8 +24,9 @@ struct CategoryCardView: View {
                 .font(AppTypography.bodyMedium)
                 .foregroundStyle(Color.onBackground)
                 .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
         }
+        .frame(height: 234)
         .padding(8)
         .background(Color.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

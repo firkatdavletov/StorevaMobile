@@ -9,4 +9,5 @@ data class HomeCallbacks(
     val navigateToProfile: () -> Unit,
     val navigateToOrder: (Long) -> Unit,
     val navigateToAuthorization: () -> Unit,
+    val navigateToCatalog: (categoryId: Long, title: String) -> Unit,
 )

@@ -27,7 +27,7 @@ fun HomeScreen(component: HomeComponent) {
             .background(MaterialTheme.colorScheme.background),
         userName = state.userName,
         addressString = state.deliveryAddress,
-        deliveryInfo = state.deliveryInfo,
+        deliveryInfo = state.deliveryPrice.toString(),
         totalAmount = state.amount.toFloat(),
         currentOrders = state.currentOrders,
         onChangeAddressClicked = {
@@ -51,6 +51,6 @@ fun HomeScreen(component: HomeComponent) {
         },
         onOrderClicked = {
             component.onEvent(HomeViewEvent.OnOrderClicked(it))
-        }
+        },
     )
 }

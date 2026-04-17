@@ -16,9 +16,9 @@ struct CurrentOrderContent: View {
     let address: String
     let comment: String
     let orderItems: [OrderItemModel]
-    let productPrice: Int
-    let deliveryPrice: Int
-    let totalPrice: Int
+    let productPrice: Int64
+    let deliveryPrice: Int64
+    let totalPrice: Int64
     let onBackButtonClicked: () -> Void
     
     var body: some View {
@@ -127,7 +127,7 @@ extension CurrentOrderContent {
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
                 Spacer()
-                Text("\(productPrice) руб")
+                Text("\(productPrice.asCurrency())")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
             }
@@ -137,7 +137,7 @@ extension CurrentOrderContent {
                         .font(AppTypography.bodyLarge)
                         .foregroundStyle(Color.onBackground)
                     Spacer()
-                    Text("\(deliveryPrice) руб")
+                    Text("\(deliveryPrice.asCurrency())")
                         .font(AppTypography.bodyLarge)
                         .foregroundStyle(Color.onBackground)
                 }
@@ -147,39 +147,11 @@ extension CurrentOrderContent {
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
                 Spacer()
-                Text("\(totalPrice) руб")
+                Text("\(totalPrice.asCurrency())")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
             }
         }
         .padding()
     }
-}
-
-#Preview {
-    CurrentOrderContent(
-        title: "Заказ № 1234",
-        statusTitle: "Готовим",
-        deliveryType: DeliveryType.delivery,
-        address: "ул. Косоротова, 150",
-        comment: "Оставить у подъезда",
-        orderItems: [
-            OrderItemModel(
-                productId: 0,
-                name: "Ролл",
-                quantity: 2,
-                price: 399
-            ),
-            OrderItemModel(
-                productId: 2,
-                name: "Ролл",
-                quantity: 2,
-                price: 399
-            )
-        ],
-        productPrice: 798,
-        deliveryPrice: 100,
-        totalPrice: 898) {
-            
-        }
 }

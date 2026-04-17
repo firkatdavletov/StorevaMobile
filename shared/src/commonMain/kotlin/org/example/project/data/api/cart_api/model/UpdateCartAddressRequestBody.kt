@@ -10,7 +10,7 @@ import org.example.project.domain.models.DeliveryType
 data class UpdateCartAddressRequestBody(
     val deliveryType: DeliveryType,
     val deliveryAddress: AddressEntity?,
-    val departmentId: Int?,
+    val departmentId: Long?,
     val deliveryInfo: DeliveryInfoEntity,
     val comment: String?,
 )

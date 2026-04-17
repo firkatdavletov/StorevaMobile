@@ -4,8 +4,10 @@ data class ProductModel(
     val id: Long,
     val title: String,
     val description: String?,
-    val price: Float,
+    val price: Long,
     val imageUrl: String?,
     val categoryId: Long,
-    val count: Int
+    val count: Int,
+    val countStep: Int,
+    val unit: UnitOfMeasure,
 )

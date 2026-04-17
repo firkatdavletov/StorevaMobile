@@ -23,7 +23,7 @@ struct ProductCardView: View {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                 )
 
-            Text("\(Int(product.price)) руб")
+            Text("\(product.price.asInt64.asCurrency())")
                 .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundColor(Color.onBackground)
                 .padding(.horizontal, 8)
@@ -55,25 +55,4 @@ struct ProductCardView: View {
             onShowDetails(product)
         }
     }
-}
-
-#Preview {
-    ProductCardView(
-        product: Shared.ProductModel(
-            id: 0,
-            title: "Pizza",
-            description: nil,
-            price: 530.0,
-            imageUrl: nil,
-            categoryId: 4,
-            count: 56
-        )) { Int64 in
-            
-        } onRemove: { Int64 in
-            
-        } onShowDetails: { id in
-            
-        }
-        .padding()
-
 }

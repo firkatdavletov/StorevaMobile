@@ -57,7 +57,7 @@ import org.example.project.data.datastore.remote.payment.PaymentRemoteDataStore
 import org.example.project.data.datastore.remote.user.DefaultUserRemoteDatastore
 import org.example.project.data.datastore.remote.user.UserRemoteDataStore
 import org.example.project.data.mapper.AddressModelMapper
-import org.example.project.data.mapper.AuthTypesMapper
+import org.example.project.data.mapper.AuthTypeMapper
 import org.example.project.data.mapper.BankInfoMapper
 import org.example.project.data.mapper.CartItemMapper
 import org.example.project.data.mapper.CartMapper
@@ -105,7 +105,6 @@ import org.example.project.domain.usecase.cart.RemoveFromCartUseCase
 import org.example.project.domain.usecase.cart.UpdateDeliveryAddressUseCase
 import org.example.project.domain.usecase.catalog.GetCategoriesUseCase
 import org.example.project.domain.usecase.catalog.GetProductCardUseCase
-import org.example.project.domain.usecase.catalog.GetProductUseCase
 import org.example.project.domain.usecase.catalog.GetProductsUseCase
 import org.example.project.domain.usecase.catalog.LoadCatalogUseCase
 import org.example.project.domain.usecase.departments.GetDepartmentsUseCase
@@ -178,7 +177,6 @@ fun appModule() =
         factory<GetGeoAddressUseCase> { GetGeoAddressUseCase(get()) }
         factory<UpdateDeliveryAddressUseCase> { UpdateDeliveryAddressUseCase(get()) }
         factory<GetDepartmentsUseCase> { GetDepartmentsUseCase(get(), get()) }
-        factory<GetProductUseCase> { GetProductUseCase(get()) }
         factory<LoadCatalogUseCase> { LoadCatalogUseCase(get()) }
         factory<CreateOrderUseCase> { CreateOrderUseCase(get()) }
         factory<GetSbpBanksUseCase> { GetSbpBanksUseCase(get()) }
@@ -195,7 +193,7 @@ fun appModule() =
         factory { GetProductCardUseCase(get()) }
 
         // Mappers
-        factory<AuthTypesMapper> { AuthTypesMapper() }
+        factory<AuthTypeMapper> { AuthTypeMapper() }
         factory<UserMapper> { UserMapper() }
         factory<CategoryMapper> { CategoryMapper(get()) }
         factory<ProductMapper> { ProductMapper() }

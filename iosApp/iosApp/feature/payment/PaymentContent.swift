@@ -21,9 +21,9 @@ struct PaymentContent: View {
     let flat: String
     let flatInputError: String?
     let comment: String
-    let totalAmount: Int
-    let deliveryPrice: Int
-    let productPrice: Int
+    let totalAmount: Int64
+    let deliveryPrice: Int64
+    let productPrice: Int64
     let paymentTypes: [PaymentTypeModel]
     let storeIsClosed: Bool
 
@@ -49,13 +49,17 @@ struct PaymentContent: View {
                     pickupSection
                 }
                 paymentSection
-                bottomSummary
             }
-            PrimaryButton(
-                title: "Заказать",
-                onClick: onConfirmClicked,
-                enabled: deliveryType != .delivery || addressString != nil
-            )
+        }
+        .safeAreaInset(edge: .bottom) {
+            VStack {
+                bottomSummary
+                PrimaryButton(
+                    title: "Заказать",
+                    onClick: onConfirmClicked,
+                    enabled: deliveryType != .delivery || addressString != nil
+                )
+            }
             .padding()
         }
     }
@@ -201,7 +205,7 @@ extension PaymentContent {
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
                 Spacer()
-                Text("\(productPrice) руб")
+                Text("\(productPrice.asCurrency())")
                     .font(AppTypography.titleLarge)
                     .foregroundStyle(Color.onBackground)
             }
@@ -213,7 +217,7 @@ extension PaymentContent {
                         .font(AppTypography.bodyLarge)
                         .foregroundStyle(Color.onBackground)
                     Spacer()
-                    Text(deliveryPrice == 0 ? "бесплатно" : "\(deliveryPrice) руб")
+                    Text(deliveryPrice == 0 ? "бесплатно" : "\(deliveryPrice.asCurrency())")
                         .font(AppTypography.titleLarge)
                         .foregroundStyle(Color.onBackground)
                 }
@@ -224,12 +228,11 @@ extension PaymentContent {
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(Color.onBackground)
                 Spacer()
-                Text("\(totalAmount) руб")
+                Text("\(totalAmount.asCurrency())")
                     .font(AppTypography.titleLarge)
                     .foregroundStyle(Color.onBackground)
             }
         }
-        .padding(.horizontal, 16)
     }
 }
 

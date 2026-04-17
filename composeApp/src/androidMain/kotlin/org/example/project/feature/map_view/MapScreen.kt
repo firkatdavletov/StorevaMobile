@@ -34,23 +34,23 @@ fun MapScreen(component: MapComponent) {
                     component.onEvent(
                         MapViewEvent.OnMoveToLocation(
                             latitude = location.latitude,
-                            longitude = location.longitude
-                        )
+                            longitude = location.longitude,
+                        ),
                     )
                 }
             }
-        }
+        },
     )
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { scaffoldPadding ->
         MapContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding),
             addressString = state.deliveryAddress,
-            deliveryInfo = state.deliveryInfo,
+            deliveryInfo = state.deliveryPrice.toString(),
             isLoading = state.isLoading,
             isSearching = state.isSearching,
             isConfirmEnabled = state.confirmEnabled,
@@ -78,8 +78,8 @@ fun MapScreen(component: MapComponent) {
                         component.onEvent(
                             MapViewEvent.OnMoveToLocation(
                                 latitude = location.latitude,
-                                longitude = location.longitude
-                            )
+                                longitude = location.longitude,
+                            ),
                         )
                     }
                 }
@@ -89,7 +89,7 @@ fun MapScreen(component: MapComponent) {
             },
             selectedDepartment = state.selectedDepartment,
             departments = state.departments,
-            showBackButton = state.showBackButton
+            showBackButton = state.showBackButton,
         )
     }
 }

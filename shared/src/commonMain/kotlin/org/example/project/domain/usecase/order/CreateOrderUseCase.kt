@@ -28,9 +28,9 @@ class CreateOrderUseCase(
         val deliveryType: DeliveryType,
         val deliveryAddress: AddressModel?,
         val comment: String?,
-        val departmentId: Int,
+        val departmentId: Long,
         val products: List<OrderItemModel>,
-        val amount: Float,
-        val deliveryPrice: Float,
+        val amount: Long,
+        val deliveryPrice: Long,
     )
 }

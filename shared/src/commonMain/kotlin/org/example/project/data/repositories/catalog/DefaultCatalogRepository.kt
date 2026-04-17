@@ -22,7 +22,7 @@ class DefaultCatalogRepository(
     private val catalogLocalDataStore: LocalCatalogDataStore,
     private val categoryMapper: CategoryMapper,
     private val productMapper: ProductMapper,
-): CatalogRepository {
+) : CatalogRepository {
 
     private val _catalogSubject = MutableSharedFlow<List<CategoryModel>>(replay = 1)
 
@@ -40,24 +40,20 @@ class DefaultCatalogRepository(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getCategoryById(id: Long): Flow<CategoryModel?> {
         return catalogLocalDataStore.getCategory(id).map {
-            it?.let { categoryMapper.toModel(it)  }
+            it?.let { categoryMapper.toModel(it) }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getProducts(categoryId: Long): Flow<List<ProductModel>> {
+    override fun getProducts(categoryId: Long): Flow<ResultModel<List<ProductModel>>> {
         return flow {
-            val categories = _catalogSubject.replayCache.firstOrNull()
-            val products = categories?.firstOrNull { it.id == categoryId }?.products ?: emptyList()
-            emit(products)
-        }
-    }
+            val response = catalogRemoteDataStore.getProducts(categoryId)
 
-    override fun getProductCard(productId: Long): Flow<ProductModel?> {
-        return flow {
-            val catalog = catalogSubject.replayCache.firstOrNull()
-            val product = catalog?.flatMap { it.products }?.firstOrNull { it.id == productId }
-            emit(product)
+            if (response.success) {
+                emit(ResultModel.Success(productMapper.toModel(response.products)))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
         }
     }
 
@@ -75,10 +71,10 @@ class DefaultCatalogRepository(
         }
     }
 
-    override fun getProductCard(id: Int): Flow<ResultModel<ProductModel>> {
+    override fun getProductCard(id: Long): Flow<ResultModel<ProductModel>> {
         return flow {
             emit(ResultModel.Loading)
-            val response =  catalogRemoteDataStore.getProduct(id)
+            val response = catalogRemoteDataStore.getProduct(id)
 
             if (response.success && response.product != null) {
                 emit(ResultModel.Success(productMapper.toModel(response.product)))

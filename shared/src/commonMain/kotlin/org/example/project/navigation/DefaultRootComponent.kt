@@ -229,7 +229,7 @@ class DefaultRootComponent(
                 navigation.pushToFront(Config.Cart)
             },
             showProductCard = {
-                dialogNavigation.activate(DialogConfig.ProductCard(it.id.toInt()))
+                dialogNavigation.activate(DialogConfig.ProductCard(it.id))
             },
             navigateToProfile = {
                 navigation.pushToFront(Config.Profile)
@@ -246,6 +246,9 @@ class DefaultRootComponent(
             },
             navigateToAuthorization = {
                 navigation.pushToFront(Config.SignIn(HomeComponent::class.simpleName))
+            },
+            navigateToCatalog = { id, title ->
+                navigation.safePush(Config.Catalog(id, title))
             },
         )
         return get { parametersOf(componentContent, callbacks) }
@@ -453,6 +456,14 @@ class DefaultRootComponent(
         )
         return get {
             parametersOf(componentContent, dialogConfig, callbacks)
+        }
+    }
+
+    private fun StackNavigation<Config>.safePush(config: Config) {
+        if (!childStack.items.any { it.configuration == config }) {
+            pushNew(config)
+        } else {
+            pushToFront(config)
         }
     }
 }

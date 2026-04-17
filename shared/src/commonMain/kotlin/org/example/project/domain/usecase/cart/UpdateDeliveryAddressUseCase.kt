@@ -10,7 +10,7 @@ import org.example.project.domain.usecase.base.IOUseCase
 
 class UpdateDeliveryAddressUseCase(
     private val cartRepository: CartRepository,
-): IOUseCase<UpdateDeliveryAddressUseCase.Params, ResultModel<Boolean>>() {
+) : IOUseCase<UpdateDeliveryAddressUseCase.Params, ResultModel<Boolean>>() {
     override fun execute(param: Params): Flow<ResultModel<Boolean>> {
         return cartRepository.updateDeliveryAddress(
             deliveryType = param.deliveryType,
@@ -24,7 +24,7 @@ class UpdateDeliveryAddressUseCase(
     data class Params(
         val deliveryAddress: AddressModel? = null,
         val deliveryType: DeliveryType,
-        val departmentId: Int,
+        val departmentId: Long,
         val deliveryInfo: DeliveryInfoModel,
         val comment: String? = null,
     )

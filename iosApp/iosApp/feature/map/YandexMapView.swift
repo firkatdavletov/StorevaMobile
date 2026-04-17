@@ -15,7 +15,7 @@ struct YandexMapView: UIViewRepresentable {
     let position: UiPoint?
     let moveToLocation: Bool
     let showDepartments: Bool
-    let selectedDepartment: KotlinInt?
+    let selectedDepartment: Int64?
     let departments: Array<DepartmentModel>
     let deliveryType: DeliveryType
     var onMapMoved: ((Double, Double, UInt, Bool) -> Void)? = nil

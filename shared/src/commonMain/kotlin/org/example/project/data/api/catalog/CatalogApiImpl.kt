@@ -13,21 +13,23 @@ class CatalogApiImpl(private val httpClient: HttpClient) : CatalogApi {
         return httpClient.get("catalog/categories").body()
     }
 
-    override suspend fun getProduct(productId: Int): GetProductResponseBody {
-        return httpClient.get {
-            url {
-                path("catalog/product")
-                parameters.append("id", productId.toString())
-            }
-        }.body()
+    override suspend fun getProduct(productId: Long): GetProductResponseBody {
+        return httpClient
+            .get {
+                url {
+                    path("catalog/product")
+                    parameters.append("id", productId.toString())
+                }
+            }.body()
     }
 
     override suspend fun getProductsByCategory(categoryId: Long): GetProductsResponseBody {
-        return httpClient.get {
-            url {
-                path("catalog/categories")
-                parameters.append("categoryId", categoryId.toString())
-            }
-        }.body()
+        return httpClient
+            .get {
+                url {
+                    path("catalog/products")
+                    parameters.append("categoryId", categoryId.toString())
+                }
+            }.body()
     }
 }

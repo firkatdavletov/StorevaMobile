@@ -23,16 +23,16 @@ class CreateCartUseCase(
     class Params(
         val deliveryType: DeliveryType,
         val deliveryAddress: AddressModel?,
-        val departmentId: Int,
+        val departmentId: Long,
         val deliveryInfoModel: DeliveryInfoModel?,
     ) {
-        constructor(deliveryAddress: AddressModel, deliveryInfo: DeliveryInfoModel, departmentId: Int): this(
+        constructor(deliveryAddress: AddressModel, deliveryInfo: DeliveryInfoModel, departmentId: Long) : this(
             deliveryType = DeliveryType.DELIVERY,
             deliveryAddress = deliveryAddress,
             departmentId = departmentId,
             deliveryInfoModel = deliveryInfo,
         )
-        constructor(departmentId: Int): this(
+        constructor(departmentId: Long) : this(
             deliveryType = DeliveryType.PICKUP,
             deliveryAddress = null,
             departmentId = departmentId,

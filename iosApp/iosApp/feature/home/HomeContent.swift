@@ -13,12 +13,12 @@ import Shared
 struct HomeContent: View {
     let userName: String?
     let addressString: String
-    let deliveryInfo: String
+    let deliveryPrice: Int64
     let currentOrders: [OrderUIModel]
     let categories: [CategoryModel]
-    let totalAmount: Int32
-    let productsPrice: Int32
-    let freeDeliveryPrice: KotlinDouble?
+    let totalAmount: Int64
+    let productsPrice: Int64
+    let freeDeliveryPrice: Int64?
     let storeIsClosed: Bool
     let onChangeAddressClicked: () -> Void
     let onCategoryClicked: (CategoryModel) -> Void
@@ -29,73 +29,88 @@ struct HomeContent: View {
     let onRemoveFromCart: (Shared.ProductModel) -> Void
     let onShowDetails: (Shared.ProductModel) -> Void
 
-    @State private var focused: Bool = false
-    
-    var columns = [
-      GridItem(.flexible()),
-      GridItem(.flexible()),
-      GridItem(.flexible()),
-    ]
+    private let contentHorizontalPadding: CGFloat = 16
+    private let categoryGridSpacing: CGFloat = 8
+
+    private var categoryCardWidth: CGFloat {
+        let totalHorizontalPadding = contentHorizontalPadding * 2
+        let totalSpacing = categoryGridSpacing * 2
+        return (UIScreen.main.bounds.width - totalHorizontalPadding - totalSpacing) / 3
+    }
+
+    private var columns: [GridItem] {
+        Array(
+            repeating: GridItem(
+                .fixed(categoryCardWidth),
+                spacing: categoryGridSpacing,
+                alignment: .top
+            ),
+            count: 3
+        )
+    }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             headerView
-            
+
             ScrollView {
-                LazyVGrid(
-                    columns: columns,
-                ) {
-                    if (storeIsClosed) {
-                        Section(header: storeIsClosedView) {}
+                VStack(spacing: 12) {
+                    if storeIsClosed {
+                        storeIsClosedView
                     }
-                    Section(header: ordersPagerItem) {}
-                    ForEach(categories, id: \.id) { category in
-                        CategoryCardView(
-                            title: category.title,
-                            imageUrl: category.imageUrl
-                        )
+
+                    ordersPagerItem
+
+                    LazyVGrid(columns: columns, spacing: categoryGridSpacing) {
+                        ForEach(categories, id: \.id) { category in
+                            HomeCategoryCard(
+                                title: category.title,
+                                imageUrl: category.imageUrl,
+                                cardWidth: categoryCardWidth
+                            )
                             .onTapGesture {
                                 onCategoryClicked(category)
                             }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, contentHorizontalPadding)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
             }
-
-            Spacer()
-            
+        }
+        .safeAreaInset(edge: .bottom) {
             if totalAmount > 0 {
                 VStack(spacing: 8) {
-
-                    if freeDeliveryPrice != nil && productsPrice < Int32(truncating: freeDeliveryPrice!) {
-                        let remaining = Int32(truncating: freeDeliveryPrice!) - productsPrice
-                        let progress = Double(productsPrice) / Double(truncating: freeDeliveryPrice!)
+                    if let freeDeliveryPrice, productsPrice < freeDeliveryPrice {
+                        let remaining = freeDeliveryPrice - productsPrice
+                        let progress = max(0, min(1, productsPrice / freeDeliveryPrice))
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Добавьте ещё \(remaining) ₽ для бесплатной доставки")
+                            Text("Добавьте ещё \(remaining.asCurrency()) для бесплатной доставки")
                                 .font(AppTypography.bodyMedium)
                                 .foregroundColor(.primaryContainer)
-                                    ProgressView(value: progress)
-                                        .progressViewStyle(.linear)
-                                        .tint(Color.primaryContainer)
-                                }
-                                .padding(.horizontal)
+
+                            ProgressView(value: Double(progress))
+                                .progressViewStyle(.linear)
+                                .tint(Color.primaryContainer)
+                        }
+                        .padding()
                     }
 
                     PrimaryButton(
-                        title: "\(totalAmount) руб",
+                        title: "\(totalAmount.asCurrency())",
                         onClick: onCartButtonClicked,
                         enabled: true
                     )
-                    .padding(.horizontal)
+                    .padding()
                 }
-                .padding(.bottom)
+                .background(Color.background)
             }
         }
-        .onTapGesture {
-            focused = false
-        }
-        .background(.background)
+        .background(Color.background)
     }
 }
 
@@ -109,7 +124,7 @@ extension HomeContent {
                     .foregroundColor(.onPrimaryContainer)
 
                 HStack(spacing: 16) {
-                    Text(deliveryInfo)
+                    Text("Доставка: " + deliveryPrice.asCurrency())
                         .font(AppTypography.bodyMedium)
                         .foregroundColor(.onPrimaryContainer)
 
@@ -148,7 +163,7 @@ extension HomeContent {
                     HomeOrderView(
                         orderNumber: order.number,
                         status: order.status,
-                        amount: Int(order.amount)
+                        amount: order.amount
                     )
                     .padding(.vertical, 2)
                     .frame(width: UIScreen.main.bounds.width - 32)
@@ -173,7 +188,7 @@ extension HomeContent {
 struct HomeOrderView: View {
     let orderNumber: String
     let status: String
-    let amount: Int
+    let amount: Int64
 
     var body: some View {
         HStack {
@@ -186,7 +201,7 @@ struct HomeOrderView: View {
                     .foregroundStyle(Color.onSecondaryContainer)
             }
             Spacer()
-            Text("\(amount) руб")
+            Text("\(amount.asCurrency())")
                 .font(AppTypography.titleLarge)
                 .foregroundStyle(Color.onSecondaryContainer)
         }
@@ -201,19 +216,62 @@ struct HomeOrderView: View {
     }
 }
 
-struct HomeCategoryView: View {
+private struct HomeCategoryCard: View {
     let title: String
     let imageUrl: String?
+    let cardWidth: CGFloat
+
+    private var imageURL: URL? {
+        imageUrl.flatMap(URL.init(string:))
+    }
 
     var body: some View {
-        VStack {
-            Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .aspectRatio(1, contentMode: .fit)
+        VStack(alignment: .leading, spacing: 8) {
+            categoryImage
+                .frame(width: cardWidth, height: 96)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
             Text(title)
-                .font(.footnote)
+                .font(AppTypography.bodyMedium)
+                .foregroundStyle(Color.onBackground)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .frame(width: cardWidth, alignment: .top)
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    @ViewBuilder
+    private var categoryImage: some View {
+        if let imageURL {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: cardWidth, height: 96)
+                        .clipped()
+                case .empty:
+                    placeholder
+                case .failure:
+                    placeholder
+                @unknown default:
+                    placeholder
+                }
+            }
+        } else {
+            placeholder
+        }
+    }
+
+    private var placeholder: some View {
+        ZStack {
+            Color.gray.opacity(0.2)
+            Image(systemName: "photo")
+                .font(.title3)
+                .foregroundStyle(Color.gray)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

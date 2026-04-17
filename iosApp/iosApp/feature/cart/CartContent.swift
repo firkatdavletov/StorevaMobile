@@ -11,10 +11,10 @@ import Shared
 
 struct CartContent: View {
     let cartItems: [CartItemModel]
-    let productPrice: Int32
-    let deliveryPrice: Int32
-    let totalAmount: Int32
-    let freeDeliveryPrice: Int32?
+    let productPrice: Int64
+    let deliveryPrice: Int64
+    let totalAmount: Int64
+    let freeDeliveryPrice: Int64?
     let deliveryType: DeliveryType
     let onAddToCart: (CartItemModel) -> Void
     let onRemoveFromCart: (CartItemModel) -> Void
@@ -28,9 +28,11 @@ struct CartContent: View {
                 .background(Color.primaryContainer)
             // Content
             cartItemList
+        }
+        .safeAreaInset(edge: .bottom) {
             // Bottom info and button
             infoView
-                .padding(.horizontal)
+                .padding()
         }
     }
 }
@@ -83,7 +85,7 @@ extension CartContent {
                     .foregroundColor(Color.onBackground)
                 Spacer()
                 
-                Text("\(productPrice) руб")
+                Text("\(productPrice.asCurrency())")
                     .font(AppTypography.titleLarge)
                     .foregroundColor(Color.onBackground)
             }
@@ -100,7 +102,7 @@ extension CartContent {
                             .font(AppTypography.titleLarge)
                             .foregroundColor(Color.onBackground)
                     } else {
-                        Text("\(deliveryPrice) руб")
+                        Text("\(deliveryPrice.asCurrency())")
                             .font(AppTypography.titleLarge)
                             .foregroundColor(Color.onBackground)
                     }
@@ -111,7 +113,7 @@ extension CartContent {
                     .font(AppTypography.bodyLarge)
                     .foregroundColor(Color.onBackground)
                 Spacer()
-                Text("\(totalAmount) руб")
+                Text("\(totalAmount.asCurrency())")
                     .font(AppTypography.titleLarge)
                     .foregroundColor(Color.onBackground)
             }
@@ -120,33 +122,6 @@ extension CartContent {
                 onClick: onConfirm,
                 enabled: !cartItems.isEmpty
             )
-            .padding(.vertical)
         }
-    }
-}
-
-#Preview {
-    CartContent(
-        cartItems: [
-            CartItemModel(
-                productId: 0,
-                title: "Ролл запеченный",
-                quantity: 2,
-                price: 900
-            )
-        ],
-        productPrice: 300,
-        deliveryPrice: 100,
-        totalAmount: 400,
-        freeDeliveryPrice: 0,
-        deliveryType: DeliveryType.delivery
-    ) { CartItemModel in
-        
-    } onRemoveFromCart: { CartItemModel in
-        
-    } onBack: {
-        
-    } onConfirm: {
-        
     }
 }

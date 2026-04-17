@@ -8,18 +8,19 @@ import org.example.project.navigation.Config
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-fun cartModule(): Module = module {
-    single <CartComponent> { (componentContext: ComponentContext, config: Config.Cart ,callbacks: CartViewCallbacks) ->
-        DefaultCartComponent(
-            componentContext = componentContext,
-            callbacks = callbacks,
-            loadCartUseCase = get(),
-            addToCartUseCase = get(),
-            removeFromCartUseCase = get(),
-            getProductUseCase = get(),
-            cartRepository = get(),
-            securityStorage = get(),
-            snackBarManager = get()
-        )
+fun cartModule(): Module =
+    module {
+        single<CartComponent> { (componentContext: ComponentContext, config: Config.Cart, callbacks: CartViewCallbacks) ->
+            DefaultCartComponent(
+                componentContext = componentContext,
+                callbacks = callbacks,
+                loadCartUseCase = get(),
+                addToCartUseCase = get(),
+                removeFromCartUseCase = get(),
+                getProductCardUseCase = get(),
+                cartRepository = get(),
+                securityStorage = get(),
+                snackBarManager = get(),
+            )
+        }
     }
-}

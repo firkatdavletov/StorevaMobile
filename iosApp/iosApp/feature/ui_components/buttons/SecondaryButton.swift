@@ -27,10 +27,10 @@ struct SecondaryButton: View {
                     .background(Color.background.opacity(0.2))
                     .foregroundColor(enabled ? Color.primaryContainer : Color.primaryContainer.opacity(0.5))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 25)
+                        RoundedRectangle(cornerRadius: 16)
                             .stroke(enabled ? Color.primaryContainer : Color.primaryContainer.opacity(0.5), lineWidth: 2)
                     )
-                    .cornerRadius(25)
+                    .cornerRadius(16)
             }
         )
         .disabled(!enabled)

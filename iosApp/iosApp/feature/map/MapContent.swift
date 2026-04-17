@@ -10,14 +10,16 @@ import Shared
 
 struct MapContent: View {
     let addressString: String?
-    let deliveryInfo: String?
+    let deliveryPrice: Int64?
+    let freeDeliveryPrice: Int64?
+    let workTimeString: String?
     let isLoading: Bool
     let isSearching: Bool
     let isConfirmEnabled: Bool
     let moveToLocation: Bool
     let deliveryType: DeliveryType
     let departments: Array<DepartmentModel>
-    let selectedDepartment: KotlinInt?
+    let selectedDepartment: Int64?
     let location: UiPoint?
     let onSelectDeliveryType: (DeliveryType) -> Void
     let onConfirm: () -> Void
@@ -64,8 +66,32 @@ struct MapContent: View {
                         .foregroundStyle(Color.darkCosmicBlue)
                         .multilineTextAlignment(.center)
                 }
-                if (deliveryInfo != nil) {
-                    Text(deliveryInfo!)
+                if (workTimeString != nil) {
+                    Text(workTimeString!)
+                        .font(AppTypography.bodyMedium)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.primaryContainer)
+                        )
+                        .foregroundStyle(Color.onPrimaryContainer)
+                        .multilineTextAlignment(.center)
+                }
+                if (deliveryPrice != nil) {
+                    Text("Доставка " + deliveryPrice!.asCurrency())
+                        .font(AppTypography.bodyMedium)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.primaryContainer)
+                        )
+                        .foregroundStyle(Color.onPrimaryContainer)
+                        .multilineTextAlignment(.center)
+                }
+                if (freeDeliveryPrice != nil) {
+                    Text("Бесплатно от " + freeDeliveryPrice!.asCurrency())
                         .font(AppTypography.bodyMedium)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -136,29 +162,4 @@ struct MapContent: View {
             }
         }
     }
-}
-
-#Preview {
-    MapContent(
-        addressString: "ул. Косоротова, 56",
-        deliveryInfo: "Доставка 100 ₽",
-        isLoading: false,
-        isSearching: false,
-        isConfirmEnabled: true,
-        moveToLocation: false,
-        deliveryType: DeliveryType.delivery,
-        departments: [],
-        selectedDepartment: KotlinInt(int: 0),
-        location: nil,
-        onSelectDeliveryType: { _ in },
-        onConfirm: {},
-        onBackButtonClicked: {},
-        onSearchAddressClicked: {},
-        onMapMoved: {_,_,_,_ in },
-        onSelectDepartment: {_ in },
-        onRequestLocation: {},
-        showBackButton: true,
-        showSearchButton: true,
-        showMap: true
-    )
 }

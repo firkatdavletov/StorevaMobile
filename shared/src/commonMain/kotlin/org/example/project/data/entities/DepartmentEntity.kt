@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DepartmentEntity(
-    val id: Int,
+    val id: Long,
     val name: String,
     val city: CityEntity,
     val latitude: Double,

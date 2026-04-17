@@ -39,9 +39,9 @@ import org.example.project.feature.ui_components.DefaultCartButton
 fun CartContent(
     modifier: Modifier,
     products: List<CartItemModel>,
-    productPrice: Int,
-    deliveryPrice: Int,
-    totalAmount: Int,
+    productPrice: Long,
+    deliveryPrice: Long,
+    totalAmount: Long,
     deliveryType: DeliveryType,
     onBackButtonClicked: () -> Unit = {},
     onAddToCart: (CartItemModel) -> Unit = {},
@@ -77,7 +77,7 @@ fun CartContent(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    text = "Корзина"
+                    text = "Корзина",
                 )
             }
 
@@ -89,7 +89,7 @@ fun CartContent(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     items(
-                        items = products
+                        items = products,
                     ) {
                         Row(
                             modifier = Modifier
@@ -102,7 +102,7 @@ fun CartContent(
                                 Text(
                                     style = AppTypography.titleMedium,
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    text = it.title
+                                    text = it.title,
                                 )
                             }
                             DefaultCartButton(
@@ -115,7 +115,7 @@ fun CartContent(
                                 },
                                 onRemoveClick = {
                                     onRemoveFromCart(it)
-                                }
+                                },
                             )
                         }
                     }
@@ -130,12 +130,12 @@ fun CartContent(
                     Text(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        text = "Стоимость продуктов:"
+                        text = "Стоимость продуктов:",
                     )
                     Text(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onBackground,
-                        text = "$productPrice ₽"
+                        text = "$productPrice ₽",
                     )
                 }
 
@@ -149,12 +149,12 @@ fun CartContent(
                         Text(
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground,
-                            text = "Стоимость доставки:"
+                            text = "Стоимость доставки:",
                         )
                         Text(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onBackground,
-                            text = if (deliveryPrice == 0) "бесплатно" else "$deliveryPrice ₽"
+                            text = if (deliveryPrice == 0L) "бесплатно" else "$deliveryPrice ₽",
                         )
                     }
                 }
@@ -168,12 +168,12 @@ fun CartContent(
                     Text(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        text = "Итого:"
+                        text = "Итого:",
                     )
                     Text(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onBackground,
-                        text = "$totalAmount ₽"
+                        text = "$totalAmount ₽",
                     )
                 }
             } else {
@@ -185,7 +185,7 @@ fun CartContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = "В корзине пусто"
+                        text = "В корзине пусто",
                     )
                 }
             }
@@ -195,11 +195,11 @@ fun CartContent(
                         .fillMaxWidth()
                         .navigationBarsPadding()
                         .padding(horizontal = 16.dp),
-                    onClick = onConfirm
+                    onClick = onConfirm,
                 ) {
                     Text(
                         style = MaterialTheme.typography.titleMedium,
-                        text = "Перейти к оплате"
+                        text = "Перейти к оплате",
                     )
                 }
             } else {
@@ -212,7 +212,7 @@ fun CartContent(
                 ) {
                     Text(
                         style = MaterialTheme.typography.titleMedium,
-                        text = "В меню"
+                        text = "В меню",
                     )
                 }
             }
@@ -232,79 +232,7 @@ private fun CartContentEmpty_Preview() {
             products = emptyList(),
             productPrice = 600,
             deliveryPrice = 100,
-            totalAmount = 700
-        )
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun CartContent_Preview() {
-    DeliveryAppTheme {
-        CartContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            deliveryType = DeliveryType.DELIVERY,
-            products = listOf(
-                CartItemModel(
-                    productId = 0,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-                CartItemModel(
-                    productId = 1,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-                CartItemModel(
-                    productId = 2,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-            ),
-            productPrice = 600,
-            deliveryPrice = 100,
-            totalAmount = 700
-        )
-    }
-}
-
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun CartContent_Preview_Night() {
-    DeliveryAppTheme {
-        CartContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            deliveryType = DeliveryType.DELIVERY,
-            products = listOf(
-                CartItemModel(
-                    productId = 0,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-                CartItemModel(
-                    productId = 1,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-                CartItemModel(
-                    productId = 2,
-                    title = "Ролл с креветкой",
-                    quantity = 1,
-                    price = 100f,
-                ),
-            ),
-            productPrice = 600,
-            deliveryPrice = 100,
-            totalAmount = 700
+            totalAmount = 700,
         )
     }
 }

@@ -23,12 +23,12 @@ struct HomeView: View {
         HomeContent(
             userName: state.userName,
             addressString: state.deliveryAddress,
-            deliveryInfo: state.deliveryInfo,
+            deliveryPrice: state.deliveryPrice.asInt64,
             currentOrders: state.currentOrders,
             categories: state.categories,
-            totalAmount: Int32(state.amount),
-            productsPrice: Int32(state.productsPrice),
-            freeDeliveryPrice: state.freeDeliveryPrice,
+            totalAmount: state.amount.asInt64,
+            productsPrice: state.productsPrice.asInt64,
+            freeDeliveryPrice: state.freeDeliveryPrice.asInt64,
             storeIsClosed: state.storeIsClosed,
             onChangeAddressClicked: {
                 component.onEvent(event: HomeViewEventOnAddressClicked())

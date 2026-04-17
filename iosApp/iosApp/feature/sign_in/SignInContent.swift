@@ -7,11 +7,12 @@
 //
 
 import SwiftUI
+import Shared
 
 struct SignInContent: View {
     let onPhoneNumberEntered: (String) -> Void
     let isLoading: Bool
-    let authTypes: [String]
+    let authTypes: [AuthTypeModel]
     let onAuthTypeClicked: (String) -> Void
     let onLoginButtonClicked: (String) -> Void
     let onBackClicked: () -> Void
@@ -31,9 +32,6 @@ struct SignInContent: View {
                             
                     Spacer(minLength: 40)
                             
-                    titleView()
-                        .padding(.horizontal)
-                            
                     phoneInputCardView()
                         .preferredColorScheme(.light)
                         .padding(.horizontal)
@@ -45,8 +43,23 @@ struct SignInContent: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .safeAreaInset(edge: .top) {
+            HStack {
+                IconButton(
+                    systemName: "arrow.backward",
+                    tint: Color.onPrimaryContainer,
+                    foreground: Color.primaryContainer,
+                    action: onBackClicked
+                )
+                Spacer()
+            }
+            .padding()
+        }
         .safeAreaInset(edge: .bottom) {
-            bottomLoginButton()
+            VStack {
+                bottomText()
+                authTypesButtonsView()
+            }
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -94,29 +107,33 @@ struct SignInContent: View {
     private func phoneInputCardView() -> some View {
         VStack {
             HStack {
-                Text("Номер телефона")
+                Text("Подтвердите номер телефона")
                     .foregroundStyle(Color.onPrimaryContainer)
                     .font(AppTypography.titleSmall)
                 Spacer()
             }
             phoneInputView()
-//            authTypesButtonsView()
         }
     }
     
     @ViewBuilder
     private func authTypesButtonsView() -> some View {
-        VStack {
+        LazyVGrid(
+            columns: [.init(.adaptive(minimum: 100))],
+        ) {
             ForEach(authTypes, id: \.self) { type in
-                PrimaryButton(
-                    title: "Продолжить",
-                    onClick: {
-                        onAuthTypeClicked(type)
+                ConfirmButton(
+                    title: type.title,
+                    onConfirm: {
+                        onAuthTypeClicked(type.key)
                     },
-                    enabled: !isLoading
+                    isLoading: isLoading,
+                    isDisabled: isLoading
                 )
             }
         }
+        .padding(.horizontal)
+        .padding(.bottom)
     }
     
     @ViewBuilder
@@ -179,23 +196,16 @@ struct SignInContent: View {
         .cornerRadius(16)
     }
     
-    private func bottomLoginButton() -> some View {
+    private func bottomText() -> some View {
         VStack {
-            SecondaryButton(
-                title: "Продолжить",
-                onClick: {
-                    onAuthTypeClicked("call")
-                },
-                enabled: phoneNumber.count >= 13 && !isLoading
-            )
-            Text("Продолжая, вы соглашаетесь с Политикой конфиденциальности и Условиями использования мобильного приложения")
+            Text("Подтверждая, вы соглашаетесь с Политикой конфиденциальности")
                 .foregroundStyle(Color.onPrimaryContainer)
                 .font(AppTypography.bodySmall)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading) // 1. Растягиваем на всю ширину
                 .contentShape(Rectangle()) // чтобы кликабельной была вся область
                 .onTapGesture {
-                    if let url = URL(string: "https://yandex.ru") {
+                    if let url = URL(string: "https://foodbox-service-firkat.amvera.io/privacy-policy") {
                         openURL(url) // 2. Открываем браузер
                     }
                 }
@@ -203,24 +213,6 @@ struct SignInContent: View {
         .padding(.horizontal)
         .padding(.top, 12)
         .padding(.bottom, 12)
-        .background(
-            Color.primaryContainer
-                .ignoresSafeArea(edges: .bottom)
-        )
     }
 }
 
-#Preview {
-    SignInContent(
-        onPhoneNumberEntered: { String in
-            
-        },
-        isLoading: false,
-        authTypes: ["sms"]) { String in
-            
-        } onLoginButtonClicked: { String in
-            
-        } onBackClicked: {
-            
-        }
-}

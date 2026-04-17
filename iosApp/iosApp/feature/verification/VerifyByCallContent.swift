@@ -97,13 +97,14 @@ struct VerifyByCallContent: View {
                 .padding(.bottom, 24)
                 .multilineTextAlignment(.center)
             
-            SecondaryButton(
+            ConfirmButton(
                 title: "Позвонить",
-                onClick: {
+                onConfirm: {
                     onCallPhoneClicked()
                     doCallPhone()
                 },
-                enabled: !isLoading
+                isLoading: isLoading,
+                isDisabled: isLoading
             )
             .disabled(isLoading)
             Text("Звонок бесплатный. Деньги не списываются.")

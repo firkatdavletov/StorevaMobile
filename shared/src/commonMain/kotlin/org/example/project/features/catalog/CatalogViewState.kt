@@ -6,7 +6,7 @@ import org.example.project.features.base.Reducer
 data class CatalogViewState(
     val title: String,
     val products: List<ProductModel>,
-    val amount: Double,
-    val productsPrice: Double,
-    val freeDeliveryPrice: Double?
-): Reducer.ViewState
+    val amount: Long,
+    val productsPrice: Long,
+    val freeDeliveryPrice: Long?,
+) : Reducer.ViewState

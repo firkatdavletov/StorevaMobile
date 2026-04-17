@@ -25,9 +25,9 @@ struct CurrentOrderView: View {
             address: state.addressString,
             comment: state.comment,
             orderItems: state.items,
-            productPrice: Int(state.productsPrice),
-            deliveryPrice: Int(state.deliveryPrice),
-            totalPrice: Int(state.totalAmount)
+            productPrice: state.productsPrice.asInt64,
+            deliveryPrice: state.deliveryPrice.asInt64,
+            totalPrice: state.totalAmount.asInt64
         ) {
             component.onEvent(event: CurrentOrderViewEventOnBackClicked())
         }

@@ -30,7 +30,7 @@ sealed interface MapViewEvent : Reducer.ViewEvent {
 
     data class OnChangeDeliveryType(val type: DeliveryType) : MapViewEvent
 
-    data class OnDepartmentSelected(val id: Int) : MapViewEvent
+    data class OnDepartmentSelected(val id: Long) : MapViewEvent
 
     data class OnFoundAddress(val address: GeoAddressModel) : MapViewEvent
 

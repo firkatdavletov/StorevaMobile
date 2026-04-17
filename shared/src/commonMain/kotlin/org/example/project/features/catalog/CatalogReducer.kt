@@ -2,22 +2,24 @@ package org.example.project.features.catalog
 
 import org.example.project.features.base.Reducer
 
-class CatalogReducer: Reducer<CatalogViewState, CatalogViewEvent, CatalogViewEffect> {
+class CatalogReducer : Reducer<CatalogViewState, CatalogViewEvent, CatalogViewEffect> {
     override fun reduce(
         state: CatalogViewState,
-        event: CatalogViewEvent
+        event: CatalogViewEvent,
     ): CatalogViewState {
         return when (event) {
             is CatalogViewEvent.OnProductsLoaded -> {
                 state.copy(
-                    products = event.products
+                    products = event.products,
                 )
             }
+
             is CatalogViewEvent.OnCategoryLoaded -> {
                 state.copy(
-                    title = event.category.title
+                    title = event.category.title,
                 )
             }
+
             is CatalogViewEvent.OnCartLoaded -> {
                 val newProducts = state.products.map { productModel ->
                     val cartItem = event.cartModel.items.firstOrNull { it.productId == productModel.id }
@@ -27,7 +29,7 @@ class CatalogReducer: Reducer<CatalogViewState, CatalogViewEvent, CatalogViewEff
                         productModel.copy(count = 0)
                     }
                 }
-                val productsPrice = event.cartModel.items.sumOf { it.price.toDouble() * it.quantity }
+                val productsPrice = event.cartModel.items.sumOf { it.price * it.quantity }
 
                 println("[CatalogReducer.kt productPrice: $productsPrice")
 
@@ -35,10 +37,13 @@ class CatalogReducer: Reducer<CatalogViewState, CatalogViewEvent, CatalogViewEff
                     amount = event.cartModel.totalPrice,
                     productsPrice = productsPrice,
                     freeDeliveryPrice = event.cartModel.deliveryInfo.freeDeliveryPrice,
-                    products = newProducts
+                    products = newProducts,
                 )
             }
-            else -> state
+
+            else -> {
+                state
+            }
         }
     }
 

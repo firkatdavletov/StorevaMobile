@@ -6,7 +6,7 @@ import org.example.project.features.base.Reducer
 class CurrentOrderReducer : Reducer<CurrentOrderViewState, CurrentOrderViewEvent, CurrentOrderViewEffect> {
     override fun reduce(
         state: CurrentOrderViewState,
-        event: CurrentOrderViewEvent
+        event: CurrentOrderViewEvent,
     ): CurrentOrderViewState {
         return when (event) {
             is CurrentOrderViewEvent.OnOrderLoaded -> {
@@ -16,14 +16,16 @@ class CurrentOrderReducer : Reducer<CurrentOrderViewState, CurrentOrderViewEvent
                     addressString = event.order.deliveryAddress ?: "",
                     status = OrderStatus.getTitle(event.order.status),
                     items = event.order.items,
-                    deliveryPrice = event.order.deliveryPrice.toInt(),
-                    totalAmount = event.order.totalAmount.toInt(),
-                    productsPrice = event.order.items.sumOf { it.price.toInt() },
-                    comment = event.order.comment.orEmpty()
+                    deliveryPrice = event.order.deliveryPrice,
+                    totalAmount = event.order.totalAmount,
+                    productsPrice = event.order.items.sumOf { it.price },
+                    comment = event.order.comment.orEmpty(),
                 )
             }
 
-            else -> state
+            else -> {
+                state
+            }
         }
     }
 

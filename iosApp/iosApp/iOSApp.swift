@@ -26,6 +26,7 @@ struct iOSApp: App {
                     @unknown default: break
                     }
                 }
+                .preferredColorScheme(.light)
         }
     }
 }

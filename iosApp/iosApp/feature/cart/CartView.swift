@@ -22,10 +22,10 @@ struct CartView: View {
     var body: some View {
         CartContent(
             cartItems: state.cartItems,
-            productPrice: state.productsPrice,
-            deliveryPrice: state.deliveryPrice,
-            totalAmount: state.totalPrice,
-            freeDeliveryPrice: state.freeDeliveryPrice != nil ? Int32(truncating: state.freeDeliveryPrice!) : nil,
+            productPrice: state.productsPrice.asInt64,
+            deliveryPrice: state.deliveryPrice.asInt64,
+            totalAmount: state.totalPrice.asInt64,
+            freeDeliveryPrice: state.freeDeliveryPrice.asInt64,
             deliveryType: state.deliveryType,
             onAddToCart: { item in
                 component.onEvent(event: CartViewEventOnAddToCart(product: item))
@@ -41,5 +41,6 @@ struct CartView: View {
             }
         )
         .navigationBarBackButtonHidden(true)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }

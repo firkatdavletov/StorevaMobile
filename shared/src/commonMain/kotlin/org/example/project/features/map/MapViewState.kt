@@ -11,16 +11,17 @@ data class MapViewState(
     val isError: Boolean,
     val deliveryType: DeliveryType,
     val deliveryAddress: String?,
+    val workTimeString: String?,
     val city: CityModel?,
-    val deliveryInfo: String?,
-    val freeDeliveryPrice: Int?,
+    val deliveryPrice: Long?,
+    val freeDeliveryPrice: Long?,
     val departments: List<DepartmentModel>,
-    val selectedDepartment: Int?,
+    val selectedDepartment: Long?,
     val cartDepartment: DepartmentModel?,
     val currentPosition: UiPoint?,
     val confirmEnabled: Boolean,
     val showLocation: Boolean,
     val showBackButton: Boolean,
     val showSearchButton: Boolean,
-    val errorMessage: String?
-): Reducer.ViewState
+    val errorMessage: String?,
+) : Reducer.ViewState

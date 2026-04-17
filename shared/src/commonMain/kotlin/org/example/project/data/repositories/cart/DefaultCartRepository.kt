@@ -11,7 +11,6 @@ import org.example.project.data.datastore.local.SecurityStorage
 import org.example.project.data.datastore.remote.cart.RemoteCartDataStore
 import org.example.project.data.entities.AddressEntity
 import org.example.project.data.entities.CityEntity
-import org.example.project.domain.models.ResultModel
 import org.example.project.data.mapper.AddressModelMapper
 import org.example.project.data.mapper.CartMapper
 import org.example.project.data.mapper.DeliveryInfoMapper
@@ -21,6 +20,7 @@ import org.example.project.domain.models.CartModel
 import org.example.project.domain.models.DeliveryInfoModel
 import org.example.project.domain.models.DeliveryType
 import org.example.project.domain.models.ProductModel
+import org.example.project.domain.models.ResultModel
 import org.example.project.domain.repositories.CartRepository
 
 class DefaultCartRepository(
@@ -29,7 +29,7 @@ class DefaultCartRepository(
     private val cartMapper: CartMapper,
     private val addressModelMapper: AddressModelMapper,
     private val deliveryInfoMapper: DeliveryInfoMapper,
-): CartRepository {
+) : CartRepository {
 
     private val _cartSubject = MutableSharedFlow<CartModel>(replay = 1)
 
@@ -52,8 +52,8 @@ class DefaultCartRepository(
     override fun createCart(
         deliveryType: DeliveryType,
         deliveryAddress: AddressModel?,
-        departmentId: Int,
-        deliveryInfo: DeliveryInfoModel?
+        departmentId: Long,
+        deliveryInfo: DeliveryInfoModel?,
     ): Flow<ResultModel<Boolean>> {
         val deviceId = securityStorage.getDeviceId()
         val newAddress = deliveryAddress?.let {
@@ -69,10 +69,10 @@ class DefaultCartRepository(
                     name = deliveryAddress.city.name,
                     subCities = emptyList(),
                     latitude = deliveryAddress.city.latitude,
-                    longitude = deliveryAddress.city.longitude
+                    longitude = deliveryAddress.city.longitude,
                 ),
                 latitude = deliveryAddress.latitude,
-                longitude = deliveryAddress.longitude
+                longitude = deliveryAddress.longitude,
             )
         }
         val body = CreateCartRequestBody(
@@ -80,8 +80,8 @@ class DefaultCartRepository(
             deliveryType = deliveryType,
             deliveryAddress = newAddress,
             departmentId = departmentId,
-            deliveryPrice = deliveryInfo?.deliveryPrice ?: 0.0,
-            freeDeliveryPrice = deliveryInfo?.freeDeliveryPrice
+            deliveryPrice = deliveryInfo?.deliveryPrice ?: 0,
+            freeDeliveryPrice = deliveryInfo?.freeDeliveryPrice,
         )
         return flow {
             emit(ResultModel.Loading)
@@ -114,9 +114,9 @@ class DefaultCartRepository(
     override fun updateDeliveryAddress(
         deliveryType: DeliveryType,
         deliveryAddress: AddressModel?,
-        departmentId: Int,
+        departmentId: Long,
         deliveryInfo: DeliveryInfoModel,
-        comment: String?
+        comment: String?,
     ): Flow<ResultModel<Boolean>> {
         return flow {
             val request = UpdateCartAddressRequestBody(
@@ -158,15 +158,17 @@ class DefaultCartRepository(
                 productId = product.id,
                 title = product.title,
                 quantity = 1,
-                price = product.price
+                price = product.price,
+                countStep = product.countStep,
+                unit = product.unit,
             )
         }
 
-        val itemsPrice = updatedItems.sumOf { it.price.toDouble() * it.quantity }
+        val itemsPrice = updatedItems.sumOf { it.price * it.quantity }
         val freeDeliveryPrice = cart.deliveryInfo.freeDeliveryPrice
         val deliveryPrice = cart.deliveryInfo.deliveryPrice
         val totalDeliveryPrice = if (freeDeliveryPrice != null && itemsPrice >= freeDeliveryPrice) {
-            0.0
+            0
         } else {
             deliveryPrice
         }
@@ -174,7 +176,7 @@ class DefaultCartRepository(
 
         val updatedCart = cart.copy(
             items = updatedItems,
-            totalPrice = totalPrice
+            totalPrice = totalPrice,
         )
         _cartSubject.tryEmit(updatedCart)
     }

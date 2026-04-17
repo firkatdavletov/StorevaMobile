@@ -41,20 +41,20 @@ class DefaultSearchAddressComponent(
     private val getGeoAddressUseCase: GetGeoAddressUseCase,
     private val createCartUseCase: CreateCartUseCase,
     private val loadCartUseCase: LoadCartUseCase,
-    private val callbacks: SearchAddressCallbacks
+    private val callbacks: SearchAddressCallbacks,
 ) : SearchAddressComponent(
-    componentContext = componentContext,
-    snackBarManager = snackBarManager,
-    initialState = SearchAddressViewState(
-        isLoading = false,
-        isSearching = false,
-        query = "",
-        deliveryType = DeliveryType.PICKUP,
-        departments = emptyList(),
-        addresses = emptyList()
-    ),
-    reducer = SearchAddressReducer()
-) {
+        componentContext = componentContext,
+        snackBarManager = snackBarManager,
+        initialState = SearchAddressViewState(
+            isLoading = false,
+            isSearching = false,
+            query = "",
+            deliveryType = DeliveryType.PICKUP,
+            departments = emptyList(),
+            addresses = emptyList(),
+        ),
+        reducer = SearchAddressReducer(),
+    ) {
     private var job: Job? = null
     private var cartSubjectJob: Job? = null
     private var searchSubjectJob: Job? = null
@@ -63,19 +63,25 @@ class DefaultSearchAddressComponent(
 
     override fun onEvent(event: SearchAddressViewEvent) {
         when (event) {
-            SearchAddressViewEvent.OnBackClicked -> callbacks.navigateBack()
+            SearchAddressViewEvent.OnBackClicked -> {
+                callbacks.navigateBack()
+            }
+
             is SearchAddressViewEvent.OnQueryChanged -> {
                 reduce(event)
                 coroutineScope.launch {
                     searchFlow.emit(event.query)
                 }
             }
+
             is SearchAddressViewEvent.OnCartLoaded -> {
                 reduce(event)
             }
+
             is SearchAddressViewEvent.OnDepartmentsLoaded -> {
                 reduce(event)
             }
+
             is SearchAddressViewEvent.OnSearchComplete -> {
                 reduce(event)
             }
@@ -99,6 +105,7 @@ class DefaultSearchAddressComponent(
                 showError(event.message)
                 reduce(event)
             }
+
             is SearchAddressViewEvent.OnThrowError -> {
                 showThrowError(event.throwable)
                 reduce(event)
@@ -134,15 +141,14 @@ class DefaultSearchAddressComponent(
         searchSubjectJob = coroutineScope.launch {
             searchFlow
                 .debounce(1000)
-                .filter {  query ->
+                .filter { query ->
                     if (query.isBlank()) {
                         onEvent(SearchAddressViewEvent.OnSearchComplete(emptyList()))
                         false
                     } else {
                         true
                     }
-                }
-                .collect {
+                }.collect {
                     search(it)
                 }
         }
@@ -153,16 +159,18 @@ class DefaultSearchAddressComponent(
         job = coroutineScope.launch {
             println("searching: $query")
 
-            searchAddressUseCase.invoke(query)
+            searchAddressUseCase
+                .invoke(query)
                 .catch {
                     onEvent(SearchAddressViewEvent.OnThrowError(it))
-                }
-                .collect { resultModel ->
+                }.collect { resultModel ->
                     when (resultModel) {
                         is ResultModel.Error -> {
                             onEvent(SearchAddressViewEvent.OnError(resultModel.message))
                         }
+
                         ResultModel.Loading -> {}
+
                         is ResultModel.Success<List<GeoAddressModel>> -> {
                             onEvent(SearchAddressViewEvent.OnSearchComplete(resultModel.data))
                         }
@@ -173,18 +181,21 @@ class DefaultSearchAddressComponent(
 
     private fun getDepartments() {
         coroutineScope.launch {
-            getDepartmentsUseCase.invoke(Unit)
+            getDepartmentsUseCase
+                .invoke(Unit)
                 .catch {
                     onEvent(SearchAddressViewEvent.OnThrowError(it))
-                }
-                .collect { departmentModels ->
+                }.collect { departmentModels ->
                     _departments = departmentModels
                     onEvent(SearchAddressViewEvent.OnDepartmentsLoaded(departmentModels))
                 }
         }
     }
 
-    private suspend fun updateAddress(geoAddress: GeoAddressModel, departmentModel: DepartmentModel) {
+    private suspend fun updateAddress(
+        geoAddress: GeoAddressModel,
+        departmentModel: DepartmentModel,
+    ) {
         val addressModel = AddressModel(
             street = geoAddress.street,
             house = geoAddress.house,
@@ -197,18 +208,20 @@ class DefaultSearchAddressComponent(
             deliveryType = DeliveryType.DELIVERY,
             deliveryAddress = addressModel,
             departmentId = departmentModel.id,
-            deliveryInfo = geoAddress.deliveryInfo ?: DeliveryInfoModel(0.0, 0.0)
+            deliveryInfo = geoAddress.deliveryInfo ?: DeliveryInfoModel(0, 0),
         )
-        updateDeliveryAddressUseCase.invoke(params)
+        updateDeliveryAddressUseCase
+            .invoke(params)
             .catch {
                 onEvent(SearchAddressViewEvent.OnThrowError(it))
-            }
-            .collect { resultModel ->
+            }.collect { resultModel ->
                 when (resultModel) {
                     is ResultModel.Error -> {
                         onEvent(SearchAddressViewEvent.OnError(resultModel.message))
                     }
+
                     ResultModel.Loading -> {}
+
                     is ResultModel.Success<Boolean> -> {
                         when (fromScreen) {
                             HomeComponent::class.simpleName -> {
@@ -234,30 +247,36 @@ class DefaultSearchAddressComponent(
             }
     }
 
-    private fun getGeoAddress(uri: String, entrance: Int?) {
+    private fun getGeoAddress(
+        uri: String,
+        entrance: Int?,
+    ) {
         val param = GetGeoAddressUseCase.Params(uri, entrance)
         coroutineScope.launch {
-            getGeoAddressUseCase.invoke(param)
+            getGeoAddressUseCase
+                .invoke(param)
                 .catch {
                     onEvent(SearchAddressViewEvent.OnThrowError(it))
-                }
-                .collect { resultModel ->
+                }.collect { resultModel ->
                     when (resultModel) {
                         is ResultModel.Error -> {
                             onEvent(SearchAddressViewEvent.OnError(resultModel.message))
                         }
+
                         ResultModel.Loading -> {}
+
                         is ResultModel.Success<GeoAddressModel> -> {
                             val closestDepartment = findClosestDepartment(
                                 resultModel.data.latitude,
                                 resultModel.data.longitude,
-                                _departments
+                                _departments,
                             ) ?: return@collect
 
                             when (fromScreen) {
                                 LaunchComponent::class.simpleName -> {
                                     createCart(resultModel.data, closestDepartment)
                                 }
+
                                 else -> {
                                     updateAddress(resultModel.data, closestDepartment)
                                 }
@@ -268,7 +287,10 @@ class DefaultSearchAddressComponent(
         }
     }
 
-    private fun createCart(geoAddress: GeoAddressModel, closestDepartment: DepartmentModel?) {
+    private fun createCart(
+        geoAddress: GeoAddressModel,
+        closestDepartment: DepartmentModel?,
+    ) {
         val deliveryType = DeliveryType.DELIVERY
         val deliveryInfo = geoAddress.deliveryInfo
 
@@ -296,17 +318,21 @@ class DefaultSearchAddressComponent(
                             intercome = null,
                             comment = null,
                             latitude = geoAddress.latitude,
-                            longitude = geoAddress.longitude
+                            longitude = geoAddress.longitude,
                         ),
                         deliveryInfo = deliveryInfo,
-                        departmentId = closestDepartment.id
+                        departmentId = closestDepartment.id,
                     )
                 } else {
                     if (deliveryInfo == null) {
-                        onEvent(SearchAddressViewEvent.OnError("Ошибка выбора адреса доставки: нет информации о доставке"))
+                        onEvent(
+                            SearchAddressViewEvent.OnError("Ошибка выбора адреса доставки: нет информации о доставке"),
+                        )
                     }
                     if (closestDepartment == null) {
-                        onEvent(SearchAddressViewEvent.OnError("Ошибка выбора адреса доставки: нет ближайшего ресторана"))
+                        onEvent(
+                            SearchAddressViewEvent.OnError("Ошибка выбора адреса доставки: нет ближайшего ресторана"),
+                        )
                     }
 
                     null
@@ -317,18 +343,17 @@ class DefaultSearchAddressComponent(
         if (params == null) return
 
         coroutineScope.launch {
-            createCartUseCase.invoke(params)
+            createCartUseCase
+                .invoke(params)
                 .catch {
                     onEvent(SearchAddressViewEvent.OnThrowError(it))
-                }
-                .collect { result ->
+                }.collect { result ->
                     when (result) {
                         is ResultModel.Error -> {
                             onEvent(SearchAddressViewEvent.OnError(result.message))
                         }
 
                         ResultModel.Loading -> {
-
                         }
 
                         is ResultModel.Success<Boolean> -> {
@@ -345,8 +370,7 @@ class DefaultSearchAddressComponent(
         loadCartUseCase(Unit)
             .catch {
                 onEvent(SearchAddressViewEvent.OnThrowError(it))
-            }
-            .collect { result ->
+            }.collect { result ->
                 withContext(Dispatchers.Main) {
                     when (result) {
                         is ResultModel.Error -> {
@@ -367,7 +391,7 @@ class DefaultSearchAddressComponent(
     private fun findClosestDepartment(
         lat: Double,
         lon: Double,
-        departments: List<DepartmentModel>
+        departments: List<DepartmentModel>,
     ): DepartmentModel? {
         return departments.minByOrNull { department ->
             DistanceCalculator.haversineDistance(lat, lon, department.latitude, department.longitude)

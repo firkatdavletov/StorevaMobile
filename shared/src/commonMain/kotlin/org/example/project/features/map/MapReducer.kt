@@ -45,7 +45,14 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                 state.copy(
                     isSearching = true,
                     deliveryAddress = if (state.deliveryType == DeliveryType.DELIVERY) null else state.deliveryAddress,
-                    deliveryInfo = if (state.deliveryType == DeliveryType.DELIVERY) null else state.deliveryInfo,
+                    deliveryPrice = if (state.deliveryType == DeliveryType.DELIVERY) null else state.deliveryPrice,
+                    freeDeliveryPrice = if (state.deliveryType ==
+                        DeliveryType.DELIVERY
+                    ) {
+                        null
+                    } else {
+                        state.freeDeliveryPrice
+                    },
                     isError = false,
                     showLocation = false,
                     currentPosition = UiPoint(event.latitude, event.longitude),
@@ -96,7 +103,9 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     isSearching = event.type == DeliveryType.DELIVERY,
                     isError = false,
                     deliveryAddress = if (event.type == DeliveryType.DELIVERY) null else department?.name,
-                    deliveryInfo = if (event.type == DeliveryType.DELIVERY) null else workTimeStr,
+                    deliveryPrice = null,
+                    freeDeliveryPrice = null,
+                    workTimeString = if (event.type == DeliveryType.DELIVERY) null else workTimeStr,
                     deliveryType = event.type,
                     selectedDepartment = department?.id,
                     currentPosition = currentPosition,
@@ -117,14 +126,12 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     if (department.isWorkingNow) {
                         department.currentWorkingHours
                     }
-                    val workTimeStr = department.let {
-                        buildString {
-                            val workingHours = department.currentWorkingHours
-                            if (department.isWorkingNow && workingHours != null) {
-                                append("с ${workingHours.openTime} до ${workingHours.closeTime}")
-                            } else {
-                                append("Не работает")
-                            }
+                    val workTimeStr = buildString {
+                        val workingHours = department.currentWorkingHours
+                        if (department.isWorkingNow && workingHours != null) {
+                            append("с ${workingHours.openTime} до ${workingHours.closeTime}")
+                        } else {
+                            append("Не работает")
                         }
                     }
                     state.copy(
@@ -134,7 +141,8 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                             it.copy(selected = it.id == event.id)
                         },
                         selectedDepartment = department.id,
-                        deliveryInfo = workTimeStr,
+                        deliveryPrice = null,
+                        workTimeString = workTimeStr,
                         currentPosition = UiPoint(department.latitude, department.longitude),
                         confirmEnabled = true,
                     )
@@ -160,20 +168,6 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     }
                 }
 
-                val deliveryInfo = buildString {
-                    append("Доставка ")
-                    if (deliveryPrice != null && deliveryPrice > 0.0) {
-                        append("${deliveryPrice.toInt()} руб")
-
-                        if (freeDeliveryPrice != null) {
-                            append("\n")
-                            append("от ${freeDeliveryPrice.toInt()} рублей бесплатно")
-                        }
-                    } else {
-                        append("бесплатно")
-                    }
-                }
-
                 val point = UiPoint(event.address.latitude, event.address.longitude)
 
                 state.copy(
@@ -181,7 +175,8 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                     isError = false,
                     currentPosition = point,
                     deliveryAddress = addressString,
-                    deliveryInfo = deliveryInfo,
+                    deliveryPrice = deliveryPrice,
+                    freeDeliveryPrice = freeDeliveryPrice,
                     confirmEnabled = true,
                     city = event.address.city,
                 )
@@ -209,7 +204,7 @@ class MapReducer : Reducer<MapViewState, MapViewEvent, MapViewEffect> {
                 state.copy(
                     isSearching = false,
                     isError = true,
-                    deliveryInfo = event.message,
+                    deliveryPrice = null,
                     confirmEnabled = false,
                 )
             }

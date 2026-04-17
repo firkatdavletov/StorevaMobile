@@ -10,8 +10,8 @@ import org.example.project.domain.usecase.base.IOUseCase
 
 class GetProductCardUseCase(
     private val catalogRepository: CatalogRepository,
-): IOUseCase<Int, ResultModel<ProductModel>>() {
-    override fun execute(param: Int): Flow<ResultModel<ProductModel>> {
+) : IOUseCase<Long, ResultModel<ProductModel>>() {
+    override fun execute(param: Long): Flow<ResultModel<ProductModel>> {
         return catalogRepository.getProductCard(param)
     }
 }

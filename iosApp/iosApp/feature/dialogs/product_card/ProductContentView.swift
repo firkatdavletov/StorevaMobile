@@ -27,7 +27,7 @@ struct ProductContentView: View {
                             .font(.title2)
                             .fontWeight(.semibold)
 
-                        Text(priceText)
+                        Text(product.price.asInt64.asCurrency())
                             .font(.title3)
                             .fontWeight(.bold)
                         
@@ -60,9 +60,5 @@ struct ProductContentView: View {
             }
             .padding(.horizontal)
         }
-    }
-
-    private var priceText: String {
-        String(format: "%.0f руб", product.price)
     }
 }

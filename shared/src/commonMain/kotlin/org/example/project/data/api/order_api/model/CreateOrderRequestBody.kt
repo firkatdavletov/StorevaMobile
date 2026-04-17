@@ -10,9 +10,9 @@ import org.example.project.domain.models.DeliveryType
 class CreateOrderRequestBody(
     val deliveryType: DeliveryType,
     val deliveryAddress: AddressEntity?,
-    val products: List<OrderItemEntity>,
-    val departmentId: Int,
-    val amount: Float,
-    val deliveryPrice: Float,
     val comment: String?,
+    val products: List<OrderItemEntity>,
+    val departmentId: Long,
+    val amount: Long,
+    val deliveryPrice: Long,
 )

@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.compose.DeliveryAppTheme
 import com.example.ui.theme.AppTypography
+import org.example.project.domain.models.AuthTypeModel
 import org.example.project.feature.ui_components.DefaultTextField
 import org.example.project.utils.PhoneNumberVisualTransformation
 
@@ -41,7 +42,7 @@ fun SignInContent(
     isLoading: Boolean,
     phoneNumber: String,
     onPhoneNumberChanged: (String) -> Unit = {},
-    authTypes: List<String>,
+    authTypes: List<AuthTypeModel>,
     onAuthTypeClicked: (String) -> Unit = {},
  ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -106,7 +107,7 @@ fun SignInContent(
                     ) {
                         Button(
                             onClick = {
-                                onAuthTypeClicked(authTypes[it])
+                                onAuthTypeClicked(authTypes[it].key)
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -114,7 +115,7 @@ fun SignInContent(
                             )
                         ) {
                             Text(
-                                text = when (authTypes[it]) {
+                                text = when (authTypes[it].key) {
                                     "sms" -> "СМС"
                                     "call" -> "По звонку"
                                     else -> ""
@@ -150,7 +151,7 @@ private fun SignInContent_Preview() {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             isLoading = false,
-            authTypes = listOf("sms", "call"),
+            authTypes = emptyList(),
             phoneNumber = "",
         )
     }

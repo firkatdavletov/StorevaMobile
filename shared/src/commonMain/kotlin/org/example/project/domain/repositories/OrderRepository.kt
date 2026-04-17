@@ -17,10 +17,10 @@ interface OrderRepository {
     fun createOrder(
         deliveryType: DeliveryType,
         deliveryAddress: AddressModel?,
-        departmentId: Int,
+        departmentId: Long,
         products: List<OrderItemModel>,
-        amount: Float,
-        deliveryPrice: Float,
+        amount: Long,
+        deliveryPrice: Long,
         comment: String?,
     ): Flow<ResultModel<OrderModel>>
     suspend fun clearOrders()

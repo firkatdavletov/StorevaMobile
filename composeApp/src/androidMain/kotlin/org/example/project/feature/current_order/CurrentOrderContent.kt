@@ -39,9 +39,9 @@ fun CurrentOrderContent(
     orderNumber: String,
     status: String,
     orderItems: List<OrderItemModel>,
-    productsPrice: Int,
-    deliveryPrice: Int,
-    totalPrice: Int,
+    productsPrice: Long,
+    deliveryPrice: Long,
+    totalPrice: Long,
     comment: String = "",
     onBackButtonClicked: () -> Unit = {},
 ) {
@@ -254,7 +254,7 @@ fun CurrentOrderContent(
                             Text(
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyLarge,
-                                text = if (deliveryPrice == 0) "бесплатно" else "$deliveryPrice ₽"
+                                text = if (deliveryPrice == 0L) "бесплатно" else "$deliveryPrice ₽"
                             )
                         }
                         Row(
@@ -278,78 +278,5 @@ fun CurrentOrderContent(
                 }
             }
         }
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun CurrentOrderContent_Preview() {
-    DeliveryAppTheme {
-        CurrentOrderContent(
-            orderNumber = "0464",
-            status = "Готовим",
-            deliveryType = DeliveryType.PICKUP,
-            addressString = "ул. Щербакова 150/2б кв. 88",
-            comment = "Комментарий",
-            productsPrice = 260,
-            deliveryPrice = 150,
-            totalPrice = 410,
-            orderItems = listOf(
-                OrderItemModel(
-                    productId = 0,
-                    name = "Пицца",
-                    quantity = 1,
-                    price = 100f
-                ),
-                OrderItemModel(
-                    productId = 2,
-                    name = "Бургер",
-                    quantity = 3,
-                    price = 500f
-                ),
-                OrderItemModel(
-                    productId = 3,
-                    name = "Ролл",
-                    quantity = 2,
-                    price = 150f
-                )
-            )
-        )
-    }
-}
-
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun CurrentOrderContent_Preview_Night() {
-    DeliveryAppTheme {
-        CurrentOrderContent(
-            orderNumber = "0464",
-            status = "Готовим",
-            deliveryType = DeliveryType.PICKUP,
-            addressString = "ул. Щербакова 150/2б кв. 88",
-            productsPrice = 260,
-            deliveryPrice = 150,
-            totalPrice = 410,
-            orderItems = listOf(
-                OrderItemModel(
-                    productId = 0,
-                    name = "Пицца",
-                    quantity = 1,
-                    price = 100f
-                ),
-                OrderItemModel(
-                    productId = 2,
-                    name = "Бургер",
-                    quantity = 3,
-                    price = 500f
-                ),
-                OrderItemModel(
-                    productId = 3,
-                    name = "Ролл",
-                    quantity = 2,
-                    price = 150f
-                )
-            )
-        )
     }
 }

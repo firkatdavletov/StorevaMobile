@@ -39,11 +39,11 @@ class DefaultHomeComponent(
         initialState = HomeViewState(
             userName = null,
             categories = emptyList(),
-            amount = 0.0,
-            productsPrice = 0.0,
+            amount = 0,
+            productsPrice = 0,
             freeDeliveryPrice = null,
             deliveryType = DeliveryType.DELIVERY,
-            deliveryInfo = "",
+            deliveryPrice = 0,
             deliveryAddress = "",
             cartDepartment = null,
             currentOrders = emptyList(),
@@ -69,6 +69,7 @@ class DefaultHomeComponent(
             }
 
             is HomeViewEvent.OnCategoryClicked -> {
+                homeCallbacks.navigateToCatalog(event.categoryId, event.categoryTitle)
             }
 
             is HomeViewEvent.OnCartLoaded -> {

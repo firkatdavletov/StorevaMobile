@@ -24,9 +24,9 @@ struct CatalogView: View {
         CatalogContent(
             title: state.title,
             products: state.products,
-            amount: Int32(state.amount),
-            productsPrice: Int32(state.productsPrice),
-            freeDeliveryPrice: state.freeDeliveryPrice != nil ? Int32(truncating: state.freeDeliveryPrice!) : nil
+            amount: state.amount.asInt64,
+            productsPrice: state.productsPrice.asInt64,
+            freeDeliveryPrice: state.freeDeliveryPrice.asInt64
         ) { productModel in
                 component.onEvent(event: CatalogViewEventOnAddToCart(product: productModel))
             } onRemove: { productModel in
@@ -38,5 +38,7 @@ struct CatalogView: View {
             } onProductCardClicked: { product in
                 component.onEvent(event: CatalogViewEventOnProductCardClicked(product: product))
             }
+            .navigationBarBackButtonHidden(true)
+            .ignoresSafeArea(.container, edges: .bottom)
     }
 }

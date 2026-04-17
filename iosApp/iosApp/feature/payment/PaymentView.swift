@@ -32,9 +32,9 @@ struct PaymentView: View {
             flat: state.flat,
             flatInputError: state.flatInputError,
             comment: state.comment,
-            totalAmount: Int(state.totalAmount),
-            deliveryPrice: Int(state.deliveryPrice),
-            productPrice: Int(state.productPrice),
+            totalAmount: state.totalAmount.asInt64,
+            deliveryPrice: state.deliveryPrice.asInt64,
+            productPrice: state.productPrice.asInt64,
             paymentTypes: state.paymentTypes,
             storeIsClosed: state.storeIsClosed,
             onChangeDeliveryType: { deliveryType in
@@ -63,6 +63,7 @@ struct PaymentView: View {
             }
         )
         .navigationBarBackButtonHidden(true)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 

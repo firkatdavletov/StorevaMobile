@@ -42,7 +42,7 @@ class DefaultOrderRepository(
                 }
                 updatedOrders
             }
-        }
+        },
     )
 
     override fun getOrderById(id: Long): Flow<ResultModel<OrderModel>> {
@@ -61,28 +61,28 @@ class DefaultOrderRepository(
     }
 
     override fun getCurrentOrders(): Flow<List<OrderModel>> {
-        return orderRemoteDataStore.getCurrentOrders()
+        return orderRemoteDataStore
+            .getCurrentOrders()
             .onEach {
                 _ordersSubject.emit(orderMapper.toModel(it))
-            }
-            .map { orderMapper.toModel(it) }
+            }.map { orderMapper.toModel(it) }
     }
 
     override fun getOrders(): Flow<List<OrderModel>> {
-        return orderRemoteDataStore.getOrders().map { orderMapper.toModel(it)}
+        return orderRemoteDataStore.getOrders().map { orderMapper.toModel(it) }
     }
 
     override fun getOrdersHistory(): Flow<List<OrderModel>> {
-        return orderRemoteDataStore.getOrdersHistory().map { orderMapper.toModel(it)}
+        return orderRemoteDataStore.getOrdersHistory().map { orderMapper.toModel(it) }
     }
 
     override fun createOrder(
         deliveryType: DeliveryType,
         deliveryAddress: AddressModel?,
-        departmentId: Int,
+        departmentId: Long,
         products: List<OrderItemModel>,
-        amount: Float,
-        deliveryPrice: Float,
+        amount: Long,
+        deliveryPrice: Long,
         comment: String?,
     ): Flow<ResultModel<OrderModel>> {
         return flow {

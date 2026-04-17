@@ -1,10 +1,13 @@
 package org.example.project.features.catalog
 
 import com.arkivanov.decompose.ComponentContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.example.project.domain.models.ProductModel
+import org.example.project.domain.models.ResultModel
 import org.example.project.domain.repositories.CartRepository
 import org.example.project.domain.usecase.cart.AddToCartUseCase
 import org.example.project.domain.usecase.cart.LoadCartUseCase
@@ -19,39 +22,69 @@ class DefaultCatalogComponent(
     private val getProductsUseCase: GetProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
-    private val cartRepository: CartRepository
-): CatalogComponent (
-    componentContext = componentContext,
-    initialState = CatalogViewState(
-        title = title,
-        products = emptyList(),
-        amount = 0.0,
-        freeDeliveryPrice = null,
-        productsPrice = 0.0
-    ),
-    reducer = CatalogReducer(),) {
+    private val cartRepository: CartRepository,
+) : CatalogComponent(
+        componentContext = componentContext,
+        initialState = CatalogViewState(
+            title = title,
+            products = emptyList(),
+            amount = 0,
+            freeDeliveryPrice = null,
+            productsPrice = 0,
+        ),
+        reducer = CatalogReducer(),
+    ) {
     private var job: Job? = null
 
     override fun onResume() {
         coroutineScope.launch {
-            getProductsUseCase.invoke(categoryId)
-                .collect {
-                    onEvent(CatalogViewEvent.OnProductsLoaded(it))
-                    subscribeToCart()
+            getProductsUseCase
+                .invoke(categoryId)
+                .catch {
+                }.collect { resultModel ->
+                    when (resultModel) {
+                        is ResultModel.Error -> {
+                        }
+
+                        ResultModel.Loading -> {}
+
+                        is ResultModel.Success<List<ProductModel>> -> {
+                            withContext(Dispatchers.Main) {
+                                onEvent(CatalogViewEvent.OnProductsLoaded(resultModel.data))
+                                subscribeToCart()
+                            }
+                        }
+                    }
                 }
         }
     }
 
     override fun onEvent(event: CatalogViewEvent) {
         when (event) {
-            CatalogViewEvent.OnAddressClicked -> TODO()
+            CatalogViewEvent.OnAddressClicked -> {
+                TODO()
+            }
+
             CatalogViewEvent.OnBackClicked -> {
                 callbacks.onBack()
             }
-            is CatalogViewEvent.OnProductsLoaded -> reduce(event)
-            is CatalogViewEvent.OnCategoryClicked -> TODO()
-            is CatalogViewEvent.OnUserLoaded -> TODO()
-            is CatalogViewEvent.OnCategoryLoaded -> TODO()
+
+            is CatalogViewEvent.OnProductsLoaded -> {
+                reduce(event)
+            }
+
+            is CatalogViewEvent.OnCategoryClicked -> {
+                TODO()
+            }
+
+            is CatalogViewEvent.OnUserLoaded -> {
+                TODO()
+            }
+
+            is CatalogViewEvent.OnCategoryLoaded -> {
+                TODO()
+            }
+
             is CatalogViewEvent.OnAddToCart -> {
                 addToCart(event.product)
             }
@@ -69,22 +102,22 @@ class DefaultCatalogComponent(
             }
 
             is CatalogViewEvent.OnProductCardClicked -> {
-                callbacks.showProductCard(event.product.id.toInt())
+                callbacks.showProductCard(event.product.id)
             }
         }
     }
 
     private fun addToCart(product: ProductModel) {
         val params = AddToCartUseCase.Params(
-            product = product.copy(count = product.count + 1)
+            product = product.copy(count = product.count + product.countStep),
         )
         job?.cancel()
         job = coroutineScope.launch {
-            addToCartUseCase.invoke(params)
+            addToCartUseCase
+                .invoke(params)
                 .catch {
                     print(it.message)
-                }
-                .collect {
+                }.collect {
                     print(it)
                 }
         }
@@ -92,15 +125,15 @@ class DefaultCatalogComponent(
 
     private fun removeFromCart(product: ProductModel) {
         val params = RemoveFromCartUseCase.Params(
-            product = product.copy(count = product.count - 1)
+            product = product.copy(count = product.count - product.countStep),
         )
         job?.cancel()
         job = coroutineScope.launch {
-            removeFromCartUseCase.invoke(params)
+            removeFromCartUseCase
+                .invoke(params)
                 .catch {
                     print(it.message)
-                }
-                .collect {
+                }.collect {
                     print(it)
                 }
         }

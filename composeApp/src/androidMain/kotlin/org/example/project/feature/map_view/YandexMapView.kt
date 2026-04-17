@@ -32,45 +32,51 @@ fun YandexMapView(
     position: UiPoint?,
     moveToLocation: Boolean,
     showDepartments: Boolean,
-    selectedDepartment: Int?,
+    selectedDepartment: Long?,
     departments: List<DepartmentModel>,
     modifier: Modifier = Modifier,
     onMapMoved: (lat: Double, lon: Double, reason: Int, finished: Boolean) -> Unit,
-    onSelectDepartment: (Int) -> Unit,
+    onSelectDepartment: (Long) -> Unit,
 ) {
     val cameraListener by remember {
-        mutableStateOf(CameraListener { map, cameraPosition, reason, finished ->
-            onMapMoved(
-                cameraPosition.target.latitude,
-                cameraPosition.target.longitude,
-                reason.ordinal,
-                finished
-            )
-        })
+        mutableStateOf(
+            CameraListener { map, cameraPosition, reason, finished ->
+                onMapMoved(
+                    cameraPosition.target.latitude,
+                    cameraPosition.target.longitude,
+                    reason.ordinal,
+                    finished,
+                )
+            },
+        )
     }
 
     val clusterListener by remember {
-        mutableStateOf(ClusterListener { cluster ->
-            cluster.appearance.setView(
-                ViewProvider(
-                    DepartmentMapObjView(context)
+        mutableStateOf(
+            ClusterListener { cluster ->
+                cluster.appearance.setView(
+                    ViewProvider(
+                        DepartmentMapObjView(context),
+                    ),
                 )
-            )
-        })
+            },
+        )
     }
 
-    val _mapObjects = remember {
-        mutableMapOf<Int, PlacemarkMapObject>()
+    val mapObjects = remember {
+        mutableMapOf<Long, PlacemarkMapObject>()
     }
 
     val mapObjectTapListener by remember {
-        mutableStateOf(MapObjectTapListener { obj, point ->
-            val id = obj.userData as Int
-            if (id != selectedDepartment) {
-                onSelectDepartment(id)
-            }
-            true
-        })
+        mutableStateOf(
+            MapObjectTapListener { obj, point ->
+                val id = obj.userData as Long
+                if (id != selectedDepartment) {
+                    onSelectDepartment(id)
+                }
+                true
+            },
+        )
     }
 
     var clusterizedCollection by remember {
@@ -103,7 +109,8 @@ fun YandexMapView(
             })
 
             mapView.mapWindow.map.addCameraListener(cameraListener)
-            clusterizedCollection = mapView.mapWindow.map.mapObjects.addClusterizedPlacemarkCollection(clusterListener)
+            clusterizedCollection = mapView.mapWindow.map.mapObjects
+                .addClusterizedPlacemarkCollection(clusterListener)
 //            val point = Point(53.967621, 58.410023)//53.967621, 58.410023
 //            val anim = Animation(Animation.Type.SMOOTH, 0.5f)
 //            mapView.mapWindow.map.move(CameraPosition(point, 10f, 0.0f, 0.0f), anim) {}
@@ -116,9 +123,9 @@ fun YandexMapView(
                 mapView.mapWindow.map.move(CameraPosition(point, 15f, 0.0f, 0.0f), anim) {}
             }
 
-            if (showDepartments && _mapObjects.size != departments.size) {
+            if (showDepartments && mapObjects.size != departments.size) {
                 clusterizedCollection?.clear()
-                _mapObjects.clear()
+                mapObjects.clear()
 
                 departments.forEach { department ->
                     val point = Point(department.latitude, department.longitude)
@@ -130,21 +137,21 @@ fun YandexMapView(
                     mark.userData = department.id
                     mark.setView(
                         ViewProvider(
-                            DepartmentMapObjView(context)
-                        )
+                            DepartmentMapObjView(context),
+                        ),
                     )
                     mark.addTapListener(mapObjectTapListener)
-                    _mapObjects[department.id] = mark
+                    mapObjects[department.id] = mark
                 }
                 clusterizedCollection?.clusterPlacemarks(55.0, 17)
             } else if (!showDepartments) {
                 clusterizedCollection?.clear()
-                _mapObjects.clear()
+                mapObjects.clear()
             }
         },
         onRelease = { mapView ->
             mapView.onStop()
             MapKitFactory.getInstance().onStop()
-        }
+        },
     )
 }

@@ -11,8 +11,8 @@ data class CurrentOrderViewState(
     val addressString: String,
     val status: String,
     val items: List<OrderItemModel>,
-    val deliveryPrice: Int,
-    val totalAmount: Int,
-    val productsPrice: Int,
+    val deliveryPrice: Long,
+    val totalAmount: Long,
+    val productsPrice: Long,
     val comment: String,
 ) : Reducer.ViewState

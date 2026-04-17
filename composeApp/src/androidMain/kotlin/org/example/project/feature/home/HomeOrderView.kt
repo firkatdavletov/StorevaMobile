@@ -20,7 +20,7 @@ import com.example.compose.DeliveryAppTheme
 fun HomeOrderView(
     orderNumber: String,
     status: String,
-    amount: Int,
+    amount: Long,
     modifier: Modifier = Modifier,
 ) {
     Row(

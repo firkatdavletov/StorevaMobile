@@ -6,6 +6,6 @@ import org.example.project.data.api.catalog.model.GetProductsResponseBody
 
 interface CatalogApi {
     suspend fun getCatalog(): GetCatalogResponseBody
-    suspend fun getProduct(productId: Int): GetProductResponseBody
+    suspend fun getProduct(productId: Long): GetProductResponseBody
     suspend fun getProductsByCategory(categoryId: Long): GetProductsResponseBody
 }

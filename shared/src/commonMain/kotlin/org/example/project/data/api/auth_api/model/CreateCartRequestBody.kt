@@ -10,7 +10,7 @@ class CreateCartRequestBody(
     val deviceId: String,
     val deliveryType: DeliveryType,
     val deliveryAddress: AddressEntity?,
-    val departmentId: Int,
-    val deliveryPrice: Double,
-    val freeDeliveryPrice: Double?
+    val departmentId: Long,
+    val deliveryPrice: Long,
+    val freeDeliveryPrice: Long?,
 )

@@ -24,14 +24,16 @@ struct MapView: View {
     var body: some View {
         MapContent(
             addressString: state.deliveryAddress,
-            deliveryInfo: state.deliveryInfo,
+            deliveryPrice: state.deliveryPrice.asInt64,
+            freeDeliveryPrice: state.freeDeliveryPrice.asInt64,
+            workTimeString: state.workTimeString,
             isLoading: state.isLoading,
             isSearching: state.isSearching,
             isConfirmEnabled: state.confirmEnabled,
             moveToLocation: state.showLocation,
             deliveryType: state.deliveryType,
             departments: state.departments,
-            selectedDepartment: state.selectedDepartment,
+            selectedDepartment: state.selectedDepartment.asInt64,
             location: state.currentPosition,
             onSelectDeliveryType: { type in
                 component.onEvent(event: MapViewEventOnChangeDeliveryType(type: type))
@@ -49,7 +51,7 @@ struct MapView: View {
                 component.onEvent(event: MapViewEventOnMapMoved(latitude: lat, longitude: lng, reason: Int32(reason), finished: finished))
             },
             onSelectDepartment: { id in
-                component.onEvent(event: MapViewEventOnDepartmentSelected(id: Int32(id)))
+                component.onEvent(event: MapViewEventOnDepartmentSelected(id: id))
             },
             onRequestLocation: {
                 locationManager.requestLocation { location in
