@@ -1,4 +1,4 @@
-# InBox
+# Storeva Mobile
 
 Кроссплатформенное мобильное приложение доставки на **Kotlin Multiplatform** с общим бизнес-слоем для Android и iOS.
 
