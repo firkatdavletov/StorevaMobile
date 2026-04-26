@@ -33,25 +33,33 @@ kotlin {
     }
     
     sourceSets {
-        commonMain.dependencies {
-            // put your Multiplatform dependencies here
-            implementation(libs.decompose)
-            implementation(libs.essenty.lifecycle)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.koin.core)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.websocket)
-            implementation(libs.ktor.contentnegotiation)
-            implementation(libs.ktor.serialization)
-            implementation(libs.ktor.serialization.protobuf)
-            implementation(libs.ktor.client.logging)
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.decompose)
+                implementation(libs.essenty.lifecycle)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.koin.core)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.websocket)
+                implementation(libs.ktor.contentnegotiation)
+                implementation(libs.ktor.serialization)
+                implementation(libs.ktor.serialization.protobuf)
+                implementation(libs.ktor.client.logging)
+            }
         }
-        iosMain.dependencies {
-            api(libs.decompose)
-            api(libs.essenty.lifecycle)
-            api(libs.kotlinx.coroutines.core)
-            implementation(libs.ktor.client.darwin)
+
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.decompose)
+                api(libs.essenty.lifecycle)
+                api(libs.kotlinx.coroutines.core)
+                implementation(libs.ktor.client.darwin)
+            }
         }
+        iosX64Main.get().dependsOn(iosMain)
+        iosArm64Main.get().dependsOn(iosMain)
+        iosSimulatorArm64Main.get().dependsOn(iosMain)
 
         androidMain.dependencies {
             implementation(libs.androidx.security.crypto)
