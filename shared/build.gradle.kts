@@ -1,16 +1,18 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    android {
+        namespace = "org.example.project.shared"
+        compileSdk = 36
+        minSdk = 30
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -53,19 +55,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.security.crypto)
+            implementation(libs.ktor.client.okhttp)
         }
-    }
-}
-
-
-android {
-    namespace = "org.example.project.shared"
-    compileSdk = 36
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    defaultConfig {
-        minSdk = 30
     }
 }

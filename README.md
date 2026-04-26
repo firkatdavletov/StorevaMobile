@@ -46,7 +46,7 @@
 
 Проект разделён на модули:
 - `shared` — общий KMP-слой (бизнес-логика, сеть, репозитории, use cases, feature-компоненты).
-- `composeApp` — Android UI (Jetpack Compose).
+- `androidApp` — Android UI (Jetpack Compose).
 - `iosApp` — iOS UI (SwiftUI) + интеграция с общим `shared` framework.
 
 Внутри `shared`:
@@ -69,16 +69,16 @@
 ## Технологический стек
 
 ### Ядро
-- Kotlin Multiplatform (Kotlin `2.3.0`)
-- Compose Multiplatform / Jetpack Compose (`1.10.x`)
+- Kotlin Multiplatform (Kotlin `2.3.21`)
+- Jetpack Compose
 - SwiftUI (iOS слой)
 
 ### Архитектура и DI
-- Decompose (`3.4.0`) + Essenty
-- Koin (`4.1.1`)
+- Decompose (`3.5.0`) + Essenty
+- Koin (`4.2.1`)
 
 ### Сеть и данные
-- Ktor Client (`3.3.3`): REST + WebSocket
+- Ktor Client (`3.4.3`): REST + WebSocket
 - Kotlinx Serialization
 - Coroutines / Flow
 
@@ -90,7 +90,7 @@
 - iOS Keychain API
 
 ### Android
-- AGP `9.0.0`
+- AGP `9.0.1`
 - minSdk `30`, target/compileSdk `36`
 
 ### iOS
@@ -106,11 +106,11 @@
 ### Android
 1. Открыть проект в Android Studio.
 2. Дождаться sync Gradle.
-3. Запустить конфигурацию `composeApp` на эмуляторе/устройстве.
+3. Запустить конфигурацию `androidApp` на эмуляторе/устройстве.
 
 CLI-сборка:
 ```bash
-./gradlew :composeApp:assembleDebug
+./gradlew :androidApp:assembleDebug
 ```
 
 ### iOS
