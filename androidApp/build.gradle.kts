@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.compose.compiler)
+    id("storeva.tenant")
 }
 
 kotlin {
@@ -12,11 +13,10 @@ kotlin {
 }
 
 android {
-    namespace = "org.example.project"
+    namespace = "ru.storeva.android"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "org.example.project"
         minSdk = 30
         targetSdk = 36
         versionCode = 1_001_000

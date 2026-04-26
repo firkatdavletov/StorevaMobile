@@ -1,0 +1,5 @@
+package ru.storeva.android.di
+
+import org.koin.core.module.Module
+
+expect fun platformModule(): Module

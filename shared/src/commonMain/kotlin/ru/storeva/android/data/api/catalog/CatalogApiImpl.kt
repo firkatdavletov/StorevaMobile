@@ -1,0 +1,35 @@
+package ru.storeva.android.data.api.catalog
+
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.http.path
+import ru.storeva.android.data.api.catalog.model.GetCatalogResponseBody
+import ru.storeva.android.data.api.catalog.model.GetProductResponseBody
+import ru.storeva.android.data.api.catalog.model.GetProductsResponseBody
+
+class CatalogApiImpl(private val httpClient: HttpClient) : CatalogApi {
+    override suspend fun getCatalog(): GetCatalogResponseBody {
+        return httpClient.get("catalog/categories").body()
+    }
+
+    override suspend fun getProduct(productId: Long): GetProductResponseBody {
+        return httpClient
+            .get {
+                url {
+                    path("catalog/product")
+                    parameters.append("id", productId.toString())
+                }
+            }.body()
+    }
+
+    override suspend fun getProductsByCategory(categoryId: Long): GetProductsResponseBody {
+        return httpClient
+            .get {
+                url {
+                    path("catalog/products")
+                    parameters.append("categoryId", categoryId.toString())
+                }
+            }.body()
+    }
+}

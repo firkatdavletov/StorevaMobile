@@ -1,0 +1,26 @@
+package ru.storeva.android.domain.repositories
+
+import kotlinx.coroutines.flow.Flow
+import ru.storeva.android.domain.models.AuthTypeModel
+import ru.storeva.android.domain.models.ResultModel
+import ru.storeva.android.domain.models.VerifyPhoneNumberModel
+
+interface AuthRepository {
+    val updates: Flow<Boolean>
+
+    fun getAuthTypes(): Flow<ResultModel<List<AuthTypeModel>>>
+
+    fun verifyPhoneNumber(
+        phone: String,
+        type: String,
+    ): Flow<ResultModel<VerifyPhoneNumberModel>>
+
+    fun verifyCode(
+        phone: String,
+        code: String,
+    ): Flow<Boolean>
+
+    suspend fun connect(checkId: String)
+
+    suspend fun disconnect()
+}

@@ -1,0 +1,26 @@
+id: "demo"
+
+app:
+    displayName: "Storeva Demo"
+    androidApplicationId: "ru.storevademo.app"
+    iosBundleId: "ru.storevademo.app"
+
+api:
+    devBaseUrl: "https://api.storeva.ru"
+    stageBaseUrl: "https://api.storeva.ru"
+    prodBaseUrl: "https://api.storeva.ru"
+
+branding:
+    themePreset: "fashion-minimal"
+    primaryColor: "#111111"
+    accentColor: "#D5AF5D"
+    backgroundColor: "#FAF9F6"
+    cornerRadius: 0
+
+features:
+    payments: true
+    bonuses: false
+    pickupPoints: true
+    restaurantMode: false
+    tableOrders: false
+    waiterApp: false

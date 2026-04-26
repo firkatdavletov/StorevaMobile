@@ -1,0 +1,197 @@
+package ru.storeva.android.data.repositories.cart
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.flow
+import ru.storeva.android.data.api.auth_api.model.CreateCartRequestBody
+import ru.storeva.android.data.api.cart_api.model.UpdateCartAddressRequestBody
+import ru.storeva.android.data.datastore.local.SecurityStorage
+import ru.storeva.android.data.datastore.remote.cart.RemoteCartDataStore
+import ru.storeva.android.data.entities.AddressEntity
+import ru.storeva.android.data.entities.CityEntity
+import ru.storeva.android.data.mapper.AddressModelMapper
+import ru.storeva.android.data.mapper.CartMapper
+import ru.storeva.android.data.mapper.DeliveryInfoMapper
+import ru.storeva.android.domain.models.AddressModel
+import ru.storeva.android.domain.models.CartItemModel
+import ru.storeva.android.domain.models.CartModel
+import ru.storeva.android.domain.models.DeliveryInfoModel
+import ru.storeva.android.domain.models.DeliveryType
+import ru.storeva.android.domain.models.ProductModel
+import ru.storeva.android.domain.models.ResultModel
+import ru.storeva.android.domain.repositories.CartRepository
+
+class DefaultCartRepository(
+    private val securityStorage: SecurityStorage,
+    private val remoteCartDataStore: RemoteCartDataStore,
+    private val cartMapper: CartMapper,
+    private val addressModelMapper: AddressModelMapper,
+    private val deliveryInfoMapper: DeliveryInfoMapper,
+) : CartRepository {
+
+    private val _cartSubject = MutableSharedFlow<CartModel>(replay = 1)
+
+    override val cartSubject: SharedFlow<CartModel> = _cartSubject.asSharedFlow()
+
+    override fun loadCart(): Flow<ResultModel<Boolean>> {
+        return flow {
+            emit(ResultModel.Loading)
+            val result = remoteCartDataStore.getCart()
+            if (result.success && result.cart != null) {
+                val cartModel = cartMapper.toModel(result.cart)
+                _cartSubject.emit(cartModel)
+                emit(ResultModel.Success(true))
+            } else {
+                emit(ResultModel.Error(result.error, result.code))
+            }
+        }
+    }
+
+    override fun createCart(
+        deliveryType: DeliveryType,
+        deliveryAddress: AddressModel?,
+        departmentId: Long,
+        deliveryInfo: DeliveryInfoModel?,
+    ): Flow<ResultModel<Boolean>> {
+        val deviceId = securityStorage.getDeviceId()
+        val newAddress = deliveryAddress?.let {
+            AddressEntity(
+                street = deliveryAddress.street,
+                house = deliveryAddress.house,
+                entrance = deliveryAddress.entrance,
+                flat = deliveryAddress.flat,
+                intercome = deliveryAddress.intercome,
+                comment = deliveryAddress.comment,
+                city = CityEntity(
+                    id = deliveryAddress.city.id,
+                    name = deliveryAddress.city.name,
+                    subCities = emptyList(),
+                    latitude = deliveryAddress.city.latitude,
+                    longitude = deliveryAddress.city.longitude,
+                ),
+                latitude = deliveryAddress.latitude,
+                longitude = deliveryAddress.longitude,
+            )
+        }
+        val body = CreateCartRequestBody(
+            deviceId = deviceId,
+            deliveryType = deliveryType,
+            deliveryAddress = newAddress,
+            departmentId = departmentId,
+            deliveryPrice = deliveryInfo?.deliveryPrice ?: 0,
+            freeDeliveryPrice = deliveryInfo?.freeDeliveryPrice,
+        )
+        return flow {
+            emit(ResultModel.Loading)
+            val response = remoteCartDataStore.createCart(body)
+
+            if (response.success && response.token != null) {
+                securityStorage.saveCartToken(response.token)
+                emit(ResultModel.Success(true))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
+        }
+    }
+
+    override fun updateQuantity(product: ProductModel): Flow<ResultModel<Boolean>> {
+        return flow {
+            emit(ResultModel.Loading)
+            updateLocalCart(product)
+            val result = remoteCartDataStore.updateQuantity(productId = product.id, quantity = product.count)
+
+            if (result.success && result.cart != null) {
+                _cartSubject.tryEmit(cartMapper.toModel(result.cart))
+                emit(ResultModel.Success(true))
+            } else {
+                emit(ResultModel.Error(result.error, result.code))
+            }
+        }
+    }
+
+    override fun updateDeliveryAddress(
+        deliveryType: DeliveryType,
+        deliveryAddress: AddressModel?,
+        departmentId: Long,
+        deliveryInfo: DeliveryInfoModel,
+        comment: String?,
+    ): Flow<ResultModel<Boolean>> {
+        return flow {
+            val request = UpdateCartAddressRequestBody(
+                deliveryType = deliveryType,
+                deliveryAddress = deliveryAddress?.let { addressModelMapper.toEntity(it) },
+                departmentId = departmentId,
+                deliveryInfo = deliveryInfoMapper.toEntity(deliveryInfo),
+                comment = comment,
+            )
+            val response = remoteCartDataStore.updateCartAddress(request)
+
+            if (response.success && response.cart != null) {
+                _cartSubject.tryEmit(cartMapper.toModel(response.cart))
+                emit(ResultModel.Success(true))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
+        }
+    }
+
+    private fun updateLocalCart(product: ProductModel) {
+        val cart = _cartSubject.replayCache.firstOrNull() ?: return
+        val updateCartItem = cart.items.firstOrNull { it.productId == product.id }
+
+        val updatedItems = if (updateCartItem != null) {
+            if (product.count > 0) {
+                cart.items.map {
+                    if (it.productId == updateCartItem.productId) {
+                        it.copy(quantity = product.count)
+                    } else {
+                        it
+                    }
+                }
+            } else {
+                cart.items.filter { it.productId != updateCartItem.productId }
+            }
+        } else {
+            cart.items + CartItemModel(
+                productId = product.id,
+                title = product.title,
+                quantity = 1,
+                price = product.price,
+                countStep = product.countStep,
+                unit = product.unit,
+            )
+        }
+
+        val itemsPrice = updatedItems.sumOf { it.price * it.quantity }
+        val freeDeliveryPrice = cart.deliveryInfo.freeDeliveryPrice
+        val deliveryPrice = cart.deliveryInfo.deliveryPrice
+        val totalDeliveryPrice = if (freeDeliveryPrice != null && itemsPrice >= freeDeliveryPrice) {
+            0
+        } else {
+            deliveryPrice
+        }
+        val totalPrice = itemsPrice + totalDeliveryPrice
+
+        val updatedCart = cart.copy(
+            items = updatedItems,
+            totalPrice = totalPrice,
+        )
+        _cartSubject.tryEmit(updatedCart)
+    }
+
+    override fun removeAll(): Flow<ResultModel<Boolean>> {
+        return flow {
+            val response = remoteCartDataStore.removeAll()
+
+            if (response.success && response.cart != null) {
+                val cartModel = cartMapper.toModel(response.cart)
+                _cartSubject.emit(cartModel)
+                emit(ResultModel.Success(true))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
+        }
+    }
+}

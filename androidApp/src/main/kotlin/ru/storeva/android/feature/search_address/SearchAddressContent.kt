@@ -1,0 +1,218 @@
+package ru.storeva.android.feature.search_address
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import ru.storeva.android.R
+import ru.storeva.android.domain.models.DeliveryType
+import ru.storeva.android.domain.models.DepartmentModel
+import ru.storeva.android.domain.models.GeoAddressModel
+
+@Composable
+fun SearchAddressContent(
+    deliveryType: DeliveryType,
+    query: String,
+    isLoading: Boolean,
+    isSearching: Boolean,
+    departments: List<DepartmentModel>,
+    addresses: List<GeoAddressModel>,
+    onQueryChanged: (String) -> Unit = {},
+    onSelectAddress: (GeoAddressModel) -> Unit = {},
+    onBackClicked: () -> Unit = {},
+    onMapClicked: () -> Unit = {},
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .statusBarsPadding()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(
+                    onClick = onBackClicked,
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_back_16),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 8.dp)
+                        .focusRequester(focusRequester),
+                    shape = RoundedCornerShape(50),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        errorBorderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledBorderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        errorTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_loupe_16),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    },
+                    value = query,
+                    onValueChange = {
+                        onQueryChanged(it)
+                    },
+                )
+            }
+            if (isSearching) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            text = "Поиск...",
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    when (deliveryType) {
+                        DeliveryType.PICKUP -> {
+                            items(addresses.size) {
+                                val address = addresses[it]
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Text(
+                                        text = address.toString(),
+                                    )
+                                }
+                            }
+                        }
+
+                        DeliveryType.DELIVERY -> {
+                            items(addresses.size) {
+                                val address = addresses[it]
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(8.dp)
+                                        .clickable {
+                                            onSelectAddress(address)
+                                        },
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Text(
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onBackground,
+                                            text = address.toString(),
+                                        )
+
+                                        val deliveryPrice = address.deliveryInfo?.deliveryPrice?.toInt()
+                                        if (deliveryPrice != null && deliveryPrice > 0) {
+                                            Text(
+                                                style = MaterialTheme.typography.titleSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                text = "Доставка $deliveryPrice ₽",
+                                            )
+                                        }
+                                    }
+                                    Text(
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        text = address.city.name,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .navigationBarsPadding()
+                    .imePadding(),
+                onClick = onMapClicked,
+            ) {
+                Text(text = "Выбрать на карте")
+            }
+        }
+
+        if (isLoading) {
+            Dialog(
+                onDismissRequest = {},
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
+}

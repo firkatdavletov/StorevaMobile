@@ -5,11 +5,16 @@ plugins {
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    id("storeva.tenant")
+}
+
+tenantConfig {
+    generatedPackage.set("ru.storeva.generated")
 }
 
 kotlin {
     android {
-        namespace = "org.example.project.shared"
+        namespace = "ru.storeva.android.shared"
         compileSdk = 36
         minSdk = 30
 
@@ -17,11 +22,11 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "Shared"
@@ -31,7 +36,7 @@ kotlin {
             export(libs.kotlinx.coroutines.core)
         }
     }
-    
+
     sourceSets {
         val commonMain by getting {
             dependencies {
