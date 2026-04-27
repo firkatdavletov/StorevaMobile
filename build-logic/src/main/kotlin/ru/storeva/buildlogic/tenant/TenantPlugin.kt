@@ -1,7 +1,6 @@
 package ru.storeva.buildlogic.tenant
 
 import com.android.build.api.dsl.ApplicationExtension
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -100,9 +99,9 @@ class TenantPlugin : Plugin<Project> {
         android.buildFeatures.buildConfig = true
 
         android.defaultConfig.apply {
-            applicationId = config.app.androidApplicationId
+            applicationId = config.androidApp.applicationId
 
-            resValue("string", "app_name", config.app.displayName)
+            resValue("string", "app_name", config.androidApp.appName)
 
             buildConfigField("String", "TENANT_ID", config.id.kotlinString())
             buildConfigField("String", "ENVIRONMENT", env.kotlinString())
@@ -113,9 +112,7 @@ class TenantPlugin : Plugin<Project> {
             buildConfigField("boolean", "PICKUP_POINTS_ENABLED", config.features.pickupPoints.toString())
             buildConfigField("boolean", "RESTAURANT_MODE_ENABLED", config.features.restaurantMode.toString())
 
-            manifestPlaceholders["appName"] = config.app.displayName
             manifestPlaceholders["tenantId"] = config.id
-            manifestPlaceholders["deeplinkHost"] = config.app.deeplinkHost.orEmpty()
         }
 
         val androidResDir = tenantDir.resolve("android/res")
@@ -123,7 +120,8 @@ class TenantPlugin : Plugin<Project> {
             android.sourceSets
                 .getByName("main")
                 .res
-                .srcDir(androidResDir)
+                .directories
+                .add(androidResDir.absolutePath)
         }
 
         val androidAssetsDir = tenantDir.resolve("android/assets")
@@ -131,7 +129,8 @@ class TenantPlugin : Plugin<Project> {
             android.sourceSets
                 .getByName("main")
                 .assets
-                .srcDir(androidAssetsDir)
+                .directories
+                .add(androidAssetsDir.absolutePath)
         }
 
         configureGoogleServicesFileIfExists(
@@ -140,7 +139,7 @@ class TenantPlugin : Plugin<Project> {
         )
 
         project.logger.lifecycle(
-            "Configured Android tenant: $tenantId, env=$env, applicationId=${config.app.androidApplicationId}",
+            "Configured Android tenant: $tenantId, env=$env, applicationId=${config.androidApp.applicationId}",
         )
     }
 

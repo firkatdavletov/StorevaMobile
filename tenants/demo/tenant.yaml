@@ -4,6 +4,15 @@ app:
     displayName: "Storeva Demo"
     androidApplicationId: "ru.storevademo.app"
     iosBundleId: "ru.storevademo.app"
+androidApp:
+    applicationId: "ru.storevademo.app"
+    appName: "Storeva Demo"
+
+iosApp:
+    bundleId: "ru.storevademo.app"
+    displayName: "Storeva Demo"
+    deepLinkHost: "storeva.ru"
+    appIconSet: "AppIconSet"
 
 api:
     devBaseUrl: "https://api.storeva.ru"

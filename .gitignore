@@ -14,6 +14,7 @@ iosApp/iosApp.xcodeproj/
 iosApp/iosApp.xcworkspace/
 iosApp/Pods/
 iosApp/ru.lproj/
-iosApp/YandexMapsMobile.xcframework/
+iosApp/Vendor/
+iosApp/Configs/Tenant.generated.xcconfig
 
 shared/build/

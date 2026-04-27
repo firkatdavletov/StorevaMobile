@@ -2,7 +2,8 @@ package ru.storeva.buildlogic.tenant
 
 data class TenantConfig(
     val id: String,
-    val app: TenantAppConfig,
+    val androidApp: TenantAndroidAppConfig,
+    val iosApp: TenantIosAppConfig,
     val api: TenantApiConfig,
     val branding: TenantBrandingConfig,
     val features: TenantFeaturesConfig,
@@ -17,11 +18,16 @@ data class TenantConfig(
     }
 }
 
-data class TenantAppConfig(
+data class TenantAndroidAppConfig(
+    val applicationId: String,
+    val appName: String,
+)
+
+data class TenantIosAppConfig(
+    val bundleId: String,
     val displayName: String,
-    val androidApplicationId: String,
-    val iosBundleId: String,
-    val deeplinkHost: String?,
+    val deepLinkHost: String,
+    val appIconSet: String,
 )
 
 data class TenantApiConfig(

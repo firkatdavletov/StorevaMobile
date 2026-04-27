@@ -1,0 +1,15 @@
+//
+//  Debug.xcconfig
+//  iosApp
+//
+//  Created by Фиркат Давлетов on 27/04/2026.
+//  Copyright © 2026 orgName. All rights reserved.
+//
+
+#include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"
+#include? "Tenant.generated.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = $(TENANT_BUNDLE_ID)
+INFOPLIST_KEY_CFBundleDisplayName = $(APP_DISPLAY_NAME)
+INFOPLIST_KEY_CFBundleName = $(APP_DISPLAY_NAME)
+ASSETCATALOG_COMPILER_APPICON_NAME = $(TENANT_APP_ICON_NAME)

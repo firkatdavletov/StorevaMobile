@@ -15,18 +15,23 @@ object TenantConfigLoader {
             Yaml().load(input) as? Map<String, Any?>
         } ?: error("Invalid tenant yaml: ${file.absolutePath}")
 
-        val app = root.obj("app")
+        val androidApp = root.obj("androidApp")
+        val iosApp = root.obj("iosApp")
         val api = root.obj("api")
         val branding = root.obj("branding")
         val features = root.obj("features")
 
         return TenantConfig(
             id = root.string("id"),
-            app = TenantAppConfig(
-                displayName = app.string("displayName"),
-                androidApplicationId = app.string("androidApplicationId"),
-                iosBundleId = app.string("iosBundleId"),
-                deeplinkHost = app.optionalString("deeplinkHost"),
+            androidApp = TenantAndroidAppConfig(
+                applicationId = androidApp.string("applicationId"),
+                appName = androidApp.string("appName"),
+            ),
+            iosApp = TenantIosAppConfig(
+                bundleId = iosApp.string("bundleId"),
+                displayName = iosApp.string("displayName"),
+                deepLinkHost = iosApp.string("deepLinkHost"),
+                appIconSet = iosApp.string("appIconSet"),
             ),
             api = TenantApiConfig(
                 devBaseUrl = api.optionalString("devBaseUrl"),

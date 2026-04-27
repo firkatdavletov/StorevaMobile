@@ -40,7 +40,7 @@ abstract class GenerateTenantConfigTask : DefaultTask() {
                 appendLine("object BuildTenantConfig {")
                 appendLine("    const val TENANT_ID = ${config.id.kotlinString()}")
                 appendLine("    const val ENVIRONMENT = ${env.kotlinString()}")
-                appendLine("    const val APP_NAME = ${config.app.displayName.kotlinString()}")
+                appendLine("    const val APP_NAME = ${config.androidApp.appName.kotlinString()}")
                 appendLine("    const val API_BASE_URL = ${config.apiBaseUrl(env).kotlinString()}")
                 appendLine()
                 appendLine("    const val PRIMARY_COLOR = ${config.branding.primaryColor.kotlinString()}")

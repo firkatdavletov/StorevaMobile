@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.1"
+agp = "9.2.0"
 androidx-activityCompose = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
@@ -23,6 +23,7 @@ ksp-version = "2.3.2"
 
 securityCrypto = "1.1.0"
 maps-mobile = "4.19.0-lite"
+snakeyaml = "2.6"
 
 [libraries]
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -71,6 +72,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 
 maps-mobile = { module = "com.yandex.android:maps.mobile", version.ref = "maps-mobile" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

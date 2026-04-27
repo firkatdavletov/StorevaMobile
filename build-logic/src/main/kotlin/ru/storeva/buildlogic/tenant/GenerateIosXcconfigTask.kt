@@ -33,14 +33,15 @@ abstract class GenerateIosXcconfigTask : DefaultTask() {
                 appendLine("// Do not edit manually")
                 appendLine()
                 appendLine("TENANT_ID = ${config.id}")
-                appendLine("APP_DISPLAY_NAME = ${config.app.displayName}")
-                appendLine("PRODUCT_BUNDLE_IDENTIFIER = ${config.app.iosBundleId}")
+                appendLine("APP_DISPLAY_NAME = ${config.iosApp.displayName}")
+                appendLine("TENANT_BUNDLE_ID = ${config.iosApp.bundleId}")
                 appendLine("API_BASE_URL = ${config.apiBaseUrl(env).escapeXcconfigValue()}")
-                appendLine("DEEPLINK_HOST = ${config.app.deeplinkHost.orEmpty()}")
+                appendLine("DEEPLINK_HOST = ${config.iosApp.deepLinkHost}")
                 appendLine()
                 appendLine("TENANT_PRIMARY_COLOR = ${config.branding.primaryColor}")
                 appendLine("TENANT_ACCENT_COLOR = ${config.branding.accentColor}")
                 appendLine("TENANT_BACKGROUND_COLOR = ${config.branding.backgroundColor}")
+                appendLine("TENANT_APP_ICON_NAME = ${config.iosApp.appIconSet}")
             },
         )
     }
