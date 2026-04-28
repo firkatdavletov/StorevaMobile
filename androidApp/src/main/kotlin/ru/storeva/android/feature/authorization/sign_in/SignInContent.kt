@@ -30,9 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.compose.DeliveryAppTheme
 import com.example.ui.theme.AppTypography
+import ru.storeva.android.core.util.PhoneNumberVisualTransformation
 import ru.storeva.android.domain.models.AuthTypeModel
 import ru.storeva.android.feature.ui_components.DefaultTextField
-import ru.storeva.android.utils.PhoneNumberVisualTransformation
 
 @Composable
 fun SignInContent(

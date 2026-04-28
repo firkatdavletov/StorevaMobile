@@ -12,7 +12,7 @@ iosApp:
     bundleId: "ru.storevademo.app"
     displayName: "Storeva Demo"
     deepLinkHost: "storeva.ru"
-    appIconSet: "AppIconSet"
+    appIconSet: "AppIcon.appiconset"
 
 api:
     devBaseUrl: "https://api.storeva.ru"

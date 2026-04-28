@@ -1,4 +1,4 @@
-package ru.storeva.android.utils
+package ru.storeva.android.core.util
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -263,7 +263,7 @@ class PhoneNumberVisualTransformation : VisualTransformation {
 
                 10 -> {
                     TransformedText(
-                        text = AnnotatedString(
+                        text = androidx.compose.ui.text.AnnotatedString(
                             text = "+7 (${text.text.substring(0..2)})-${text.text.substring(3..5)}-${
                                 text.text.substring(
                                     6,

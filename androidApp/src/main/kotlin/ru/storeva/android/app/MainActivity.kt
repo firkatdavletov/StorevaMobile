@@ -1,4 +1,4 @@
-package ru.storeva.android
+package ru.storeva.android.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

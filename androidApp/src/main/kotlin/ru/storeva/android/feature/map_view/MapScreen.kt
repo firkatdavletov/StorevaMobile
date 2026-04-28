@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import ru.storeva.android.core.util.GeolocationService
 import ru.storeva.android.features.map.DefaultMapComponent
 import ru.storeva.android.features.map.MapComponent
 import ru.storeva.android.features.map.MapViewEvent
-import ru.storeva.android.utils.GeolocationService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

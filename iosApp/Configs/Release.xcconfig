@@ -1,12 +1,4 @@
-//
-//  Release.xcconfig
-//  iosApp
-//
-//  Created by Фиркат Давлетов on 27/04/2026.
-//  Copyright © 2026 orgName. All rights reserved.
-//
-
-#include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"
+#include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"
 #include? "Tenant.generated.xcconfig"
 
 PRODUCT_BUNDLE_IDENTIFIER = $(TENANT_BUNDLE_ID)

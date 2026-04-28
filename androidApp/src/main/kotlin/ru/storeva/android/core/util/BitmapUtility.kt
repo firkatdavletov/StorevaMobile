@@ -1,4 +1,4 @@
-package ru.storeva.android.utils
+package ru.storeva.android.core.util
 
 import android.content.Context
 import android.graphics.Bitmap

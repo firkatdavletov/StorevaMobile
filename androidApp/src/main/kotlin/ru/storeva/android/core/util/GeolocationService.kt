@@ -1,4 +1,4 @@
-package ru.storeva.android.utils
+package ru.storeva.android.core.util
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -43,22 +43,6 @@ class TenantPlugin : Plugin<Project> {
             )
         }
 
-        project.tasks.register(
-            "generateIosTenantXcconfig",
-            GenerateIosXcconfigTask::class.java,
-        ) {
-            group = "tenant"
-            description = "Generates iOS .xcconfig file from tenant.yaml"
-
-            this.tenantFile.set(tenantConfigFile)
-            environment.set(env)
-            outputFile.set(
-                project.rootProject.layout.projectDirectory.file(
-                    extension.iosConfigOutputPath.get(),
-                ),
-            )
-        }
-
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             project.extensions.configure(
                 KotlinMultiplatformExtension::class.java,
@@ -79,6 +63,62 @@ class TenantPlugin : Plugin<Project> {
                 tenantDirPath = tenantDir.asFile.absolutePath,
                 tenantFilePath = tenantConfigFile.asFile.absolutePath,
             )
+        }
+
+        project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+            val prepareIosTenantAssetsTask = project.tasks.register(
+                "prepareIosTenantAssets",
+                PrepareIosTenantAssetsTask::class.java,
+            ) {
+                group = "tenant"
+                description = "Copies iOS tenant assets into iosApp Assets.xcassets"
+
+                inputAssetsDir.set(
+                    tenantDir.dir("ios/Assets.xcassets"),
+                )
+
+                outputAssetsDir.set(
+                    project.rootProject.layout.projectDirectory.dir(
+                        "iosApp/iosApp/Assets.xcassets",
+                    ),
+                )
+            }
+
+            val generateIosTenantXcconfigTask = project.tasks.register(
+                "generateIosTenantXcconfig",
+                GenerateIosXcconfigTask::class.java,
+            ) {
+                group = "tenant"
+                description = "Generates iOS .xcconfig file from tenant.yaml"
+
+                this.tenantFile.set(tenantConfigFile)
+                environment.set(env)
+                outputFile.set(
+                    project.rootProject.layout.projectDirectory.file(
+                        extension.iosConfigOutputPath.get(),
+                    ),
+                )
+            }
+
+            project.extensions.configure(
+                KotlinMultiplatformExtension::class.java,
+            ) {
+                sourceSets.named("commonMain") {
+                    kotlin.srcDir(
+                        generateTenantConfigTask.flatMap { it.outputDir },
+                    )
+                }
+            }
+
+            if (project.path == ":shared") {
+                project.rootProject.tasks.register("prepareIosTenant") {
+                    group = "tenant"
+                    description = "Prepares iOS tenant config and assets"
+
+                    dependsOn(generateIosTenantXcconfigTask)
+                    dependsOn(prepareIosTenantAssetsTask)
+                }
+            }
         }
     }
 
