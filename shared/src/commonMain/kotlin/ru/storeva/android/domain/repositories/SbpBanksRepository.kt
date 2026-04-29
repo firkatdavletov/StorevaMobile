@@ -1,8 +1,0 @@
-package ru.storeva.android.domain.repositories
-
-import kotlinx.coroutines.flow.Flow
-import ru.storeva.android.domain.models.BankInfoModel
-
-interface SbpBanksRepository {
-    fun getBanks(canStoreToken: Boolean): Flow<List<BankInfoModel>>
-}

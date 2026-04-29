@@ -14,7 +14,7 @@ tenantConfig {
 
 kotlin {
     android {
-        namespace = "ru.storeva.android.shared"
+        namespace = "ru.storeva.app.shared"
         compileSdk = 36
         minSdk = 30
 
@@ -42,6 +42,7 @@ kotlin {
             dependencies {
                 implementation(libs.decompose)
                 implementation(libs.essenty.lifecycle)
+                implementation(libs.essenty.lifecycle.coroutines)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.koin.core)
                 implementation(libs.ktor.client.core)
@@ -50,6 +51,8 @@ kotlin {
                 implementation(libs.ktor.serialization)
                 implementation(libs.ktor.serialization.protobuf)
                 implementation(libs.ktor.client.logging)
+                implementation(libs.androidx.datastore.datastore)
+                implementation(libs.androidx.datastore.preferences)
             }
         }
 

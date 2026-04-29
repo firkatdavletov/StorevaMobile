@@ -1,0 +1,121 @@
+package ru.storeva.app.features.main_tabs
+
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.popTo
+import com.arkivanov.decompose.value.Value
+import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinScopeComponent
+import org.koin.core.component.createScope
+import org.koin.core.parameter.parametersOf
+import org.koin.core.scope.Scope
+import ru.storeva.app.features.cart.CartComponent
+import ru.storeva.app.features.cart.CartViewCallbacks
+import ru.storeva.app.features.main_tabs.MainTabsComponent.Child.*
+import ru.storeva.app.features.main_tabs.sbp_banks.SbpBanksCallbacks
+import ru.storeva.app.features.main_tabs.sbp_banks.SbpBanksComponent
+
+class DefaultMainTabsComponent(
+    private val componentContext: ComponentContext,
+    private val callback: MainTabsCallback,
+) : MainTabsComponent,
+    ComponentContext by componentContext,
+    KoinScopeComponent {
+
+    private val navigation = StackNavigation<Config>()
+
+    override val childStack: Value<ChildStack<*, MainTabsComponent.Child>>
+        get() = childStack(
+            source = navigation,
+            serializer = Config.serializer(),
+            initialConfiguration = Config.Map,
+            key = KEY,
+            childFactory = { config, context ->
+                val childKey = when (config) {
+                    is Config.Map -> "Map"
+                    is Config.Cart -> "Cart"
+                    is Config.SbpBanks -> "SbpBanks"
+                }
+                val scopedContext = context.childContext(childKey)
+                createChild(config, scopedContext)
+            },
+        )
+
+    override fun onBackClicked(toIndex: Int) {
+        navigation.popTo(toIndex)
+    }
+
+    private fun createChild(
+        config: Config,
+        componentContext: ComponentContext,
+    ): MainTabsComponent.Child {
+        return when (config) {
+            Config.Cart -> {
+                CartChild(getCartComponent(componentContext))
+            }
+
+            is Config.Map -> {
+                TODO()
+//                MapChild(getMapComponent(componentContext))
+            }
+
+            is Config.SbpBanks -> {
+                SbpBanksChild(getSbpBanksComponent(componentContext, config.qrLink, config.canStoreToken))
+            }
+        }
+    }
+
+    @Serializable
+    private sealed class Config {
+        @Serializable
+        data object Map : Config()
+
+        @Serializable
+        data object Cart : Config()
+
+        @Serializable
+        data class SbpBanks(
+            val qrLink: String,
+            val canStoreToken: Boolean,
+        ) : Config()
+    }
+
+    override val scope: Scope by lazy { createScope(this) }
+
+    private fun getCartComponent(context: ComponentContext): CartComponent {
+        val callbacks = CartViewCallbacks(
+            onBackClicked = {
+                navigation.pop()
+            },
+            navigateToPayment = {
+            },
+            navigateToLogin = {
+            },
+        )
+        return scope.get {
+            parametersOf(context, callbacks)
+        }
+    }
+
+    private fun getSbpBanksComponent(
+        context: ComponentContext,
+        qrLink: String,
+        canStoreToken: Boolean,
+    ): SbpBanksComponent {
+        val callbacks = SbpBanksCallbacks(
+            navigateToBack = { navigation.pop() },
+        )
+
+        return scope.get {
+            parametersOf(context, callbacks, qrLink, canStoreToken)
+        }
+    }
+
+    companion object {
+        private const val KEY = "main_tabs_child_stack"
+    }
+}

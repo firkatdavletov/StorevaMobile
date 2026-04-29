@@ -13,7 +13,7 @@ kotlin {
 }
 
 android {
-    namespace = "ru.storeva.android"
+    namespace = "ru.storeva.app"
     compileSdk = 36
 
     defaultConfig {

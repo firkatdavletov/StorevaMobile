@@ -1,0 +1,8 @@
+package ru.storeva.app.features.home
+
+data class OrderUIModel(
+    val id: Long,
+    val number: String,
+    val status: String,
+    val amount: Long,
+)

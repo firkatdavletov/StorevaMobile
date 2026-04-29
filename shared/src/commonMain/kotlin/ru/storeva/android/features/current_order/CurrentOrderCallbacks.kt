@@ -1,6 +1,0 @@
-package ru.storeva.android.features.current_order
-
-data class CurrentOrderCallbacks(
-    val navigateToBack: () -> Unit,
-    val navigateToHome: () -> Unit,
-)

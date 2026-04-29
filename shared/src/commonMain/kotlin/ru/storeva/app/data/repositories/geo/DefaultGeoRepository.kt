@@ -1,0 +1,45 @@
+package ru.storeva.app.data.repositories.geo
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import ru.storeva.app.data.datastore.remote.geo.GeoRemoteDatasource
+import ru.storeva.app.data.mapper.GeoAddressMapper
+import ru.storeva.app.domain.models.GeoAddressModel
+import ru.storeva.app.domain.models.ResultModel
+import ru.storeva.app.domain.repositories.GeoRepository
+
+class DefaultGeoRepository(
+    private val geoRemoteDatasource: GeoRemoteDatasource,
+    private val geoAddressMapper: GeoAddressMapper,
+) : GeoRepository {
+    override fun getAddress(
+        query: String?,
+        uri: String?,
+        entrance: Int?,
+    ): Flow<ResultModel<GeoAddressModel>> {
+        return flow {
+            emit(ResultModel.Loading)
+            val response = geoRemoteDatasource.getAddress(query, uri, entrance)
+            if (response.success && response.address != null) {
+                val geoAddress = geoAddressMapper.toModel(response.address)
+                emit(ResultModel.Success(geoAddress))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
+        }
+    }
+
+    override fun searchAddress(query: String): Flow<ResultModel<List<GeoAddressModel>>> {
+        return flow {
+            emit(ResultModel.Loading)
+            val response = geoRemoteDatasource.searchAddress(query)
+
+            if (response.success && response.addresses != null) {
+                val geoAddress = geoAddressMapper.toModel(response.addresses)
+                emit(ResultModel.Success(geoAddress))
+            } else {
+                emit(ResultModel.Error(response.error, response.code))
+            }
+        }
+    }
+}
