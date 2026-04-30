@@ -27,11 +27,23 @@ fun MainTabsContent(
             animation = stackAnimation(fade()),
         ) {
             when (val child = it.instance) {
-                is MainTabsComponent.Child.HomeChild -> HomeScreen(child.component)
-                is MainTabsComponent.Child.CatalogChild -> CatalogScreen(child.component)
-                is MainTabsComponent.Child.CartChild -> CartScreen(child.component)
-                is MainTabsComponent.Child.SbpBanksChild -> TODO()
-                is MainTabsComponent.Child.SearchAddressChild -> TODO()
+                is MainTabsComponent.Child.HomeChild -> {}
+
+                is MainTabsComponent.Child.CatalogChild -> {
+                    CatalogScreen(child.component)
+                }
+
+                is MainTabsComponent.Child.CartChild -> {
+                    CartScreen(child.component)
+                }
+
+                is MainTabsComponent.Child.SbpBanksChild -> {
+                    TODO()
+                }
+
+                is MainTabsComponent.Child.SearchAddressChild -> {
+                    TODO()
+                }
             }
         }
     }

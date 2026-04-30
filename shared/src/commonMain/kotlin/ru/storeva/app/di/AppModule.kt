@@ -123,7 +123,6 @@ import ru.storeva.app.domain.usecase.user.DeleteUserUseCase
 import ru.storeva.app.domain.usecase.user.LoadUserUseCase
 import ru.storeva.app.domain.usecase.user.LogoutUserUseCase
 import ru.storeva.app.domain.usecase.user.UpdateUserUseCase
-import ru.storeva.app.features.launch.di.launchModule
 import ru.storeva.app.features.mapper.OrderUIModelMapper
 import ru.storeva.generated.BuildTenantConfig
 
@@ -139,7 +138,7 @@ private val isHttps = true
 @OptIn(ExperimentalSerializationApi::class)
 fun appModule() =
     module {
-        includes(domainModule)
+        includes(commonModule)
 
         single<SnackBarManager> { SnackBarManager() }
         // Data stores

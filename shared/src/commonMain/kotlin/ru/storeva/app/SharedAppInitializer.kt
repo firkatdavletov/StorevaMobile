@@ -1,10 +1,9 @@
-package ru.storeva.app.app
+package ru.storeva.app
 
-import android.app.Application
-import com.yandex.mapkit.MapKitFactory
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.component.KoinComponent
+import com.arkivanov.decompose.ComponentContext
 import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatform.getKoin
+import ru.storeva.app.core.snackbar.SnackBarManager
 import ru.storeva.app.di.appIntroductionModule
 import ru.storeva.app.di.appModule
 import ru.storeva.app.di.authorizationModule
@@ -12,18 +11,17 @@ import ru.storeva.app.di.cartModule
 import ru.storeva.app.di.catalogModule
 import ru.storeva.app.di.currentOrderModule
 import ru.storeva.app.di.dialogsModule
+import ru.storeva.app.di.factory.root.RootComponentFactory
 import ru.storeva.app.di.homeModule
 import ru.storeva.app.di.mapModule
 import ru.storeva.app.di.paymentModule
 import ru.storeva.app.di.platformModule
 import ru.storeva.app.di.profileModule
+import ru.storeva.app.navigation.RootComponent
 
-class InboxApplication : Application(), KoinComponent {
-
-    override fun onCreate() {
-        super.onCreate()
+object SharedAppInitializer {
+    fun initKoin() {
         startKoin {
-            androidContext(applicationContext)
             modules(
                 appModule(),
                 mapModule(),
@@ -39,6 +37,17 @@ class InboxApplication : Application(), KoinComponent {
                 dialogsModule(),
             )
         }
-        MapKitFactory.setApiKey("ae6b93e5-52ca-4ab3-879c-34d8728b59b5")
+    }
+
+    fun createRootComponent(
+        componentContext: ComponentContext,
+        snackBarManager: SnackBarManager,
+    ): RootComponent {
+        return getKoin()
+            .get<RootComponentFactory>()
+            .create(
+                componentContext = componentContext,
+                snackBarManager = snackBarManager,
+            )
     }
 }

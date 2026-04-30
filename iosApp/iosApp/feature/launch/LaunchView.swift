@@ -12,21 +12,18 @@ import Shared
 struct LaunchView: View {
     let component: LaunchComponent
     
-    @StateValue private var state: LaunchViewState
-    @StateObject private var effectObserver = EffectObserver()
-    @State private var showToast = false
-    @State private var toastMessage = ""
+    @StateValue private var state: LaunchState
     
     init(component: LaunchComponent) {
         self.component = component
-        _state = StateValue((component as! DefaultLaunchComponent).state)
+        _state = StateValue(component.state)
     }
     var body: some View {
         LaunchContent(
             isLoading: state.isLoading,
             isError: state.isError,
             onRetryClicked: {
-                component.onEvent(event: LaunchViewEventOnReconnect())
+                component.onEvent(event_: LaunchEventRetryClicked())
             }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)

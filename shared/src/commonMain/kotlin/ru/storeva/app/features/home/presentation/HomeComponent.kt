@@ -17,8 +17,11 @@ interface HomeComponent {
 
     fun onTabSelected(tab: HomeTab)
 
+    fun onTabSelectedByIndex(index: Int)
+
     data class State(
         val selectedTab: HomeTab = HomeTab.Main,
+        val selectedTabIndex: Int = 0,
         val cartBadgeCount: Int = 0,
         val ordersBadgeCount: Int = 0,
     )

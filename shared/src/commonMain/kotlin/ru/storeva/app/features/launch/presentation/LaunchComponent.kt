@@ -8,4 +8,8 @@ interface LaunchComponent {
     val effects: Flow<LaunchEffect>
 
     fun onEvent(event: LaunchEvent)
+
+    interface Output {
+        fun onLaunchFinished()
+    }
 }

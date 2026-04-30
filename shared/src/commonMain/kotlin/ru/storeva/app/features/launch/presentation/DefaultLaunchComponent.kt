@@ -10,9 +10,9 @@ import ru.storeva.app.features.launch.domain.usecase.LoadLaunchDataUseCase
 class DefaultLaunchComponent(
     componentContext: ComponentContext,
     private val loadLaunchDataUseCase: LoadLaunchDataUseCase,
-    private val callbacks: LaunchNavigationCallbacks,
+    private val output: LaunchComponent.Output,
     dispatchers: AppDispatchers,
-    snackBarManager: SnackBarManager,
+    snackBarManager: SnackBarManager?,
     errorHandler: ComponentErrorHandler,
 ) : FeatureComponent<LaunchState, LaunchEvent, LaunchEffect>(
         componentContext = componentContext,
@@ -68,7 +68,7 @@ class DefaultLaunchComponent(
             // TODO реализовать логику в дальнейшем
             when {
                 result.minSupportedVersion == "0.0" -> {
-                    callbacks.navigateToHome()
+                    output.onLaunchFinished()
                 }
 
                 else -> {}

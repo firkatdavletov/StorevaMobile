@@ -8,12 +8,17 @@
 
 import SwiftUI
 import YandexMapsMobile
+import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    let rootHolder: RootHolder = RootHolder()
+    lazy var rootHolder = RootHolder()
+    
+    override init() {
+        SharedAppInitializer.shared.doInitKoin()
+    }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        YMKMapKit.setApiKey("ae6b93e5-52ca-4ab3-879c-34d8728b59b5")
+        YMKMapKit.setApiKey("api_key")
         YMKMapKit.sharedInstance()
         return true
     }

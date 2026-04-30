@@ -6,10 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.arkivanov.decompose.defaultComponentContext
 import com.yandex.mapkit.MapKitFactory
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.storeva.app.core.snackbar.SnackBarManager
 import ru.storeva.app.data.datastore.local.AndroidSecurityStorage
 import ru.storeva.app.data.datastore.local.SecurityStorage
+import ru.storeva.app.di.factory.root.RootComponentFactory
 import ru.storeva.app.navigation.DefaultRootComponent
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +22,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         (securityStorage as AndroidSecurityStorage).initialize(this)
         MapKitFactory.initialize(applicationContext)
-        val rootComponent = DefaultRootComponent(defaultComponentContext(), snackBarManager)
+        val rootComponent by lazy {
+            getKoin()
+                .get<RootComponentFactory>()
+                .create(
+                    componentContext = defaultComponentContext(),
+                    snackBarManager = snackBarManager,
+                )
+        }
         enableEdgeToEdge()
         setContent {
             DeliveryApp(rootComponent = rootComponent)

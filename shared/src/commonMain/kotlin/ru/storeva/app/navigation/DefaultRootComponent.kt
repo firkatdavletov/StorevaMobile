@@ -22,6 +22,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.storeva.app.core.snackbar.SnackBarManager
+import ru.storeva.app.di.factory.home.HomeComponentFactory
+import ru.storeva.app.di.factory.launch.LaunchComponentFactory
 import ru.storeva.app.features.app_introduction.AppIntroCallbacks
 import ru.storeva.app.features.app_introduction.AppIntroductionComponent
 import ru.storeva.app.features.authorization.sign_in_component.SignInCallbacks
@@ -67,6 +69,8 @@ import ru.storeva.app.navigation.RootComponent.Child.Verification
 
 class DefaultRootComponent(
     componentContext: ComponentContext,
+    private val homeComponentFactory: HomeComponentFactory,
+    private val launchComponentFactory: LaunchComponentFactory,
     override val snackBarManager: SnackBarManager,
 ) : RootComponent, ComponentContext by componentContext, KoinComponent {
 
@@ -105,7 +109,16 @@ class DefaultRootComponent(
             }
 
             is Config.Launch -> {
-                Launch(getLaunchComponent(componentContext))
+                RootComponent.Child.Launch(
+                    launchComponentFactory.create(
+                        componentContext = componentContext,
+                        output = object : LaunchComponent.Output {
+                            override fun onLaunchFinished() {
+                                navigation.safePush(Config.Home)
+                            }
+                        },
+                    ),
+                )
             }
 
             is Config.SelectAddress -> {
@@ -113,7 +126,11 @@ class DefaultRootComponent(
             }
 
             is Config.Home -> {
-                Home(getHomeComponent(componentContext, config))
+                Home(
+                    component = homeComponentFactory.create(
+                        componentContext = componentContext,
+                    ),
+                )
             }
 
             is Config.Cart -> {

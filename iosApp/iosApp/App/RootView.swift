@@ -35,7 +35,7 @@ struct RootView: View {
                 case let child as RootComponentChild.AppIntroduction: AppIntroductionView(component: child.component)
                 case let child as RootComponentChild.Authorization: EmptyView()
                 case let child as RootComponentChild.SelectAddress: MapView(component: child.component)
-                case let child as RootComponentChild.Home: HomeView(component: child.component)
+                case let child as RootComponentChild.Home: HomeContent(component: child.component)
                 case let child as RootComponentChild.Catalog: CatalogView(component: child.component)
                 case let child as RootComponentChild.Cart: CartView(component: child.component)
                 case let child as RootComponentChild.Payment: PaymentView(component: child.component)

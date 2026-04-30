@@ -1,6 +1,7 @@
 package ru.storeva.app.features.home.presentation
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
 import ru.storeva.app.core.component.ComponentErrorHandler
 import ru.storeva.app.core.component.FeatureComponent
 import ru.storeva.app.core.coroutine.AppDispatchers
@@ -15,7 +16,7 @@ class DefaultHomeComponent(
     dispatchers: AppDispatchers,
     errorHandler: ComponentErrorHandler,
     snackBarManager: SnackBarManager? = null,
-    private val dependencies: HomeDependencies,
+    dependencies: HomeDependencies,
 ) : FeatureComponent<HomeComponent.State, HomeEvent, HomeEffect>(
         componentContext,
         initialState = HomeComponent.State(),
@@ -30,18 +31,37 @@ class DefaultHomeComponent(
         }
     }
 
-    override val mainComponent: MainTabComponent
-        get() = TODO("Not yet implemented")
-    override val catalogComponent: CatalogTabComponent
-        get() = TODO("Not yet implemented")
-    override val cartComponent: CartTabComponent
-        get() = TODO("Not yet implemented")
-    override val profileComponent: ProfileTabComponent
-        get() = TODO("Not yet implemented")
+    override val mainComponent: MainTabComponent =
+        dependencies.mainTabComponentFactory.create(
+            componentContext = childContext(key = "main_tab"),
+        )
+    override val catalogComponent: CatalogTabComponent =
+        dependencies.catalogComponentFactory.create(
+            componentContext = childContext("catalog_tab"),
+        )
+    override val cartComponent: CartTabComponent =
+        dependencies.cartComponentFactory.create(
+            componentContext = childContext(key = "cart_tab"),
+        )
+    override val profileComponent: ProfileTabComponent =
+        dependencies.profileComponentFactory.create(
+            componentContext = childContext("profile_tab"),
+        )
 
     override fun onTabSelected(tab: HomeTab) {
         setState {
-            copy(selectedTab = tab)
+            copy(selectedTab = tab, selectedTabIndex = tab.ordinal)
         }
+    }
+
+    override fun onTabSelectedByIndex(index: Int) {
+        val tab = when (index) {
+            HomeTab.Main.ordinal -> HomeTab.Main
+            HomeTab.Catalog.ordinal -> HomeTab.Catalog
+            HomeTab.Cart.ordinal -> HomeTab.Cart
+            else -> HomeTab.Profile
+        }
+
+        onTabSelected(tab)
     }
 }

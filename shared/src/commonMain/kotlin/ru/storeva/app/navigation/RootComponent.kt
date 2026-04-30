@@ -15,6 +15,7 @@ import ru.storeva.app.features.dialogs.delete_user_dialog.DeleteUserComponent
 import ru.storeva.app.features.dialogs.logout_user_dialog.LogoutUserComponent
 import ru.storeva.app.features.dialogs.product_card.ProductCardComponent
 import ru.storeva.app.features.home.HomeComponentOld
+import ru.storeva.app.features.home.presentation.HomeComponent
 import ru.storeva.app.features.launch.presentation.LaunchComponent
 import ru.storeva.app.features.main_tabs.MainTabsComponent
 import ru.storeva.app.features.map.MapComponent
@@ -40,7 +41,7 @@ interface RootComponent {
 
         class MainTabs(val component: MainTabsComponent) : Child()
 
-        class Home(val component: HomeComponentOld) : Child()
+        class Home(val component: HomeComponent) : Child()
 
         class SelectAddress(val component: MapComponent) : Child()
 

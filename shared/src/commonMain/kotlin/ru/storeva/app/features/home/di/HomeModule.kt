@@ -1,4 +1,4 @@
-package ru.storeva.app.di.factory
+package ru.storeva.app.features.home.di
 
 import org.koin.dsl.module
 import ru.storeva.app.di.factory.home.DefaultHomeComponentFactory
@@ -13,7 +13,7 @@ import ru.storeva.app.features.home.presentation.HomeDependencies
 import ru.storeva.app.features.maintab.DefaultMainTabComponent
 import ru.storeva.app.features.profile.DefaultProfileTabComponent
 
-val componentFactoryModule = module {
+val homeModule = module {
     single<HomeComponentFactory> {
         DefaultHomeComponentFactory(
             dispatchers = get(),
@@ -30,7 +30,7 @@ val componentFactoryModule = module {
             catalogComponentFactory = get(),
             cartComponentFactory = get(),
             profileComponentFactory = get(),
-            mainComponent = get(),
+            mainTabComponentFactory = get(),
         )
     }
 

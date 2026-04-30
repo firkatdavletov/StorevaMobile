@@ -18,3 +18,5 @@ iosApp/Vendor/
 iosApp/Configs/Tenant.generated.xcconfig
 
 shared/build/
+
+tenants
